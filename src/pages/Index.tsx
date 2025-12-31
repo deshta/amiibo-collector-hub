@@ -417,7 +417,12 @@ export default function Index() {
         />
 
         {/* Series Stats */}
-        <SeriesStats amiibos={amiibos} userAmiibos={userAmiibos} />
+        <SeriesStats 
+          amiibos={amiibos} 
+          userAmiibos={userAmiibos} 
+          selectedSeries={selectedSeries}
+          onSeriesClick={setSelectedSeries}
+        />
 
         {/* Search & Filter */}
         <div className="flex flex-col gap-4 mb-8 animate-slide-up" style={{ animationDelay: '200ms' }}>

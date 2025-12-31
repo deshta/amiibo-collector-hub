@@ -15,9 +15,11 @@ interface UserAmiibo {
 interface SeriesStatsProps {
   amiibos: Amiibo[];
   userAmiibos: UserAmiibo[];
+  selectedSeries?: string;
+  onSeriesClick?: (series: string) => void;
 }
 
-export function SeriesStats({ amiibos, userAmiibos }: SeriesStatsProps) {
+export function SeriesStats({ amiibos, userAmiibos, selectedSeries, onSeriesClick }: SeriesStatsProps) {
   const { t } = useLanguage();
   
   const seriesStats = useMemo(() => {
@@ -57,11 +59,22 @@ export function SeriesStats({ amiibos, userAmiibos }: SeriesStatsProps) {
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto pr-2">
-        {seriesStats.map((series) => (
-          <div 
-            key={series.name} 
-            className="p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
-          >
+        {seriesStats.map((series) => {
+          const isNoSeries = series.name === t('stats.noSeries');
+          const filterValue = isNoSeries ? 'all' : series.name;
+          const isSelected = selectedSeries === series.name || (selectedSeries === 'all' && isNoSeries);
+          
+          return (
+            <div 
+              key={series.name} 
+              className={`p-3 rounded-xl transition-all cursor-pointer ${
+                isSelected 
+                  ? 'bg-primary/20 ring-2 ring-primary' 
+                  : 'bg-muted/30 hover:bg-muted/50'
+              }`}
+              onClick={() => onSeriesClick?.(selectedSeries === series.name ? 'all' : (isNoSeries ? 'all' : series.name))}
+              title={`Filtrar por ${series.name}`}
+            >
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium text-foreground text-sm truncate flex-1 mr-2">
                 {series.name}
@@ -76,8 +89,9 @@ export function SeriesStats({ amiibos, userAmiibos }: SeriesStatsProps) {
                 {series.percentage}%
               </span>
             </div>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
