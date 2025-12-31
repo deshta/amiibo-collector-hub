@@ -11,7 +11,7 @@ import { SeriesStats } from '@/components/SeriesStats';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Filter, Loader2, ChevronLeft, ChevronRight, ArrowUpDown, Heart } from 'lucide-react';
+import { Search, Filter, Loader2, ChevronLeft, ChevronRight, ArrowUpDown, Heart, X } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -390,6 +390,16 @@ export default function Index() {
     setCurrentPage(1);
   }, [search, selectedSeries, selectedType, filter, sortBy, sortOrder]);
 
+  // Check if any filters are active
+  const hasActiveFilters = search !== '' || selectedSeries !== 'all' || selectedType !== 'all' || filter !== 'all';
+
+  const clearAllFilters = () => {
+    setSearch('');
+    setSelectedSeries('all');
+    setSelectedType('all');
+    setFilter('all');
+  };
+
   const collectedCount = userAmiibos.length;
   const boxedCount = userAmiibos.filter(ua => ua.is_boxed).length;
 
@@ -513,7 +523,7 @@ export default function Index() {
             </Button>
           </div>
           
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
             <Button
               variant={filter === 'all' ? 'default' : 'glass'}
               onClick={() => setFilter('all')}
@@ -546,6 +556,18 @@ export default function Index() {
                 </span>
               )}
             </Button>
+            
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearAllFilters}
+                className="text-muted-foreground hover:text-destructive gap-1"
+              >
+                <X className="w-4 h-4" />
+                <span className="hidden sm:inline">{t('index.clearFilters')}</span>
+              </Button>
+            )}
           </div>
         </div>
         
