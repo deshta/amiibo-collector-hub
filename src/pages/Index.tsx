@@ -421,7 +421,17 @@ export default function Index() {
           amiibos={amiibos} 
           userAmiibos={userAmiibos} 
           selectedSeries={selectedSeries}
-          onSeriesClick={setSelectedSeries}
+          onSeriesClick={(series) => {
+            setSelectedSeries(series);
+            if (series !== 'all') {
+              setTimeout(() => {
+                document.getElementById('amiibo-grid')?.scrollIntoView({ 
+                  behavior: 'smooth', 
+                  block: 'start' 
+                });
+              }, 100);
+            }
+          }}
         />
 
         {/* Search & Filter */}
@@ -525,7 +535,7 @@ export default function Index() {
         </div>
         
         {/* Results count */}
-        <div className="mb-4 text-sm text-muted-foreground">
+        <div id="amiibo-grid" className="mb-4 text-sm text-muted-foreground scroll-mt-4">
           {t('index.showing')} {paginatedAmiibos.length} {t('index.of')} {filteredAmiibos.length} {t('index.amiibos')}
           {selectedSeries !== 'all' && ` ${t('index.fromSeries')} "${selectedSeries}"`}
         </div>
