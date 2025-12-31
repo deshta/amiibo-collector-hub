@@ -32,10 +32,13 @@ interface Amiibo {
   type: string | null;
 }
 
+export type AmiiboCondition = 'new' | 'used' | 'damaged';
+
 interface UserAmiibo {
   id: string;
   amiibo_id: string;
   is_boxed: boolean;
+  condition: AmiiboCondition;
 }
 
 interface WishlistItem {
@@ -89,7 +92,10 @@ export default function Index() {
       if (wishlistResult.error) throw wishlistResult.error;
 
       setAmiibos(amiibosResult.data || []);
-      setUserAmiibos(collectionResult.data || []);
+      setUserAmiibos((collectionResult.data || []).map(item => ({
+        ...item,
+        condition: (item.condition || 'new') as AmiiboCondition
+      })));
       setWishlist(wishlistResult.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -115,7 +121,10 @@ export default function Index() {
 
       if (error) throw error;
 
-      setUserAmiibos([...userAmiibos, data]);
+      setUserAmiibos([...userAmiibos, {
+        ...data,
+        condition: (data.condition || 'new') as AmiiboCondition
+      }]);
       
       // Remove from wishlist if it was there
       if (wishlist.some(w => w.amiibo_id === amiiboId)) {
@@ -189,6 +198,37 @@ export default function Index() {
       toast({
         title: 'Erro',
         description: 'Não foi possível atualizar o status.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const updateCondition = async (amiiboId: string, condition: AmiiboCondition) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_amiibos')
+        .update({ condition })
+        .eq('user_id', user.id)
+        .eq('amiibo_id', amiiboId);
+
+      if (error) throw error;
+
+      setUserAmiibos(userAmiibos.map(ua => 
+        ua.amiibo_id === amiiboId ? { ...ua, condition } : ua
+      ));
+      
+      const conditionLabels = { new: 'Novo', used: 'Usado', damaged: 'Danificado' };
+      toast({
+        title: 'Atualizado!',
+        description: `Condição alterada para "${conditionLabels[condition]}".`,
+      });
+    } catch (error) {
+      console.error('Error updating condition:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível atualizar a condição.',
         variant: 'destructive',
       });
     }
@@ -472,6 +512,7 @@ export default function Index() {
                     isInCollection={!!userAmiibo}
                     isBoxed={userAmiibo?.is_boxed || false}
                     isInWishlist={isInWishlist(amiibo.id)}
+                    condition={userAmiibo?.condition || 'new'}
                     onAdd={() => addToCollection(amiibo.id)}
                     onRemove={() => removeFromCollection(amiibo.id)}
                     onToggleBoxed={() => toggleBoxed(amiibo.id, userAmiibo?.is_boxed || false)}
@@ -548,6 +589,7 @@ export default function Index() {
         isInCollection={selectedAmiibo ? !!getUserAmiibo(selectedAmiibo.id) : false}
         isBoxed={selectedAmiibo ? getUserAmiibo(selectedAmiibo.id)?.is_boxed || false : false}
         isInWishlist={selectedAmiibo ? isInWishlist(selectedAmiibo.id) : false}
+        condition={selectedAmiibo ? getUserAmiibo(selectedAmiibo.id)?.condition || 'new' : 'new'}
         onAdd={() => selectedAmiibo && addToCollection(selectedAmiibo.id)}
         onRemove={() => selectedAmiibo && removeFromCollection(selectedAmiibo.id)}
         onToggleBoxed={() => {
@@ -557,6 +599,7 @@ export default function Index() {
           }
         }}
         onToggleWishlist={() => selectedAmiibo && toggleWishlist(selectedAmiibo.id)}
+        onConditionChange={(condition) => selectedAmiibo && updateCondition(selectedAmiibo.id, condition)}
       />
 
       {/* Footer */}
