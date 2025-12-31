@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Gamepad2, Mail, Lock, User, Sparkles } from 'lucide-react';
+import { Mail, Lock, User, Sparkles, Star, Heart } from 'lucide-react';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -76,14 +76,30 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      {/* Decorative elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 text-primary/20 animate-float">
+          <Star className="w-12 h-12" />
+        </div>
+        <div className="absolute top-40 right-20 text-secondary/30 animate-bounce-subtle">
+          <Heart className="w-8 h-8" />
+        </div>
+        <div className="absolute bottom-32 left-1/4 text-accent/20 animate-float" style={{ animationDelay: '1s' }}>
+          <Star className="w-6 h-6" />
+        </div>
+        <div className="absolute bottom-20 right-1/3 text-primary/15 animate-bounce-subtle" style={{ animationDelay: '0.5s' }}>
+          <Heart className="w-10 h-10" />
+        </div>
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8 animate-slide-up">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-nintendo shadow-glow mb-4">
-            <Gamepad2 className="w-10 h-10 text-primary-foreground" />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-lg mb-4">
+            <span className="text-4xl">✨</span>
           </div>
           <h1 className="text-3xl font-extrabold text-foreground mb-2">
-            Amiibo Collection
+            Minha Coleção
           </h1>
           <p className="text-muted-foreground">
             {isLogin ? 'Entre para gerenciar sua coleção' : 'Crie sua conta e comece a colecionar'}
@@ -91,7 +107,7 @@ export default function Auth() {
         </div>
 
         {/* Form Card */}
-        <div className="glass-card rounded-2xl p-8 animate-scale-in">
+        <div className="glass-card rounded-2xl p-8 animate-scale-in shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
               <div className="space-y-2">
@@ -178,6 +194,11 @@ export default function Auth() {
               {isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entre'}
             </button>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center text-sm text-muted-foreground">
+          <p>Organize e acompanhe sua coleção de colecionáveis</p>
         </div>
       </div>
     </div>
