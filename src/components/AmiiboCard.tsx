@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Plus, Package, Trash2 } from 'lucide-react';
+import { Check, Plus, Package, Trash2, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -11,9 +11,11 @@ interface AmiiboCardProps {
   type: string | null;
   isInCollection?: boolean;
   isBoxed?: boolean;
+  isInWishlist?: boolean;
   onAdd?: () => void;
   onRemove?: () => void;
   onToggleBoxed?: () => void;
+  onToggleWishlist?: () => void;
 }
 
 // Helper to get full image URL from storage path
@@ -32,9 +34,11 @@ export function AmiiboCard({
   type,
   isInCollection = false,
   isBoxed = false,
+  isInWishlist = false,
   onAdd,
   onRemove,
   onToggleBoxed,
+  onToggleWishlist,
 }: AmiiboCardProps) {
   const [imageError, setImageError] = useState(false);
   const imageUrl = getImageUrl(imagePath);
@@ -55,6 +59,32 @@ export function AmiiboCard({
           </div>
         </div>
       )}
+
+      {/* Wishlist Badge */}
+      {isInWishlist && !isInCollection && (
+        <div className="absolute -top-2 -right-2 z-10">
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-pink-500 shadow-md">
+            <Heart className="w-4 h-4 text-white fill-white" />
+          </div>
+        </div>
+      )}
+
+      {/* Wishlist Button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleWishlist?.();
+        }}
+        className={cn(
+          "absolute top-2 left-2 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all",
+          isInWishlist 
+            ? "bg-pink-500 text-white" 
+            : "bg-background/80 text-muted-foreground hover:bg-pink-500/20 hover:text-pink-500"
+        )}
+        title={isInWishlist ? "Remover da wishlist" : "Adicionar à wishlist"}
+      >
+        <Heart className={cn("w-4 h-4", isInWishlist && "fill-current")} />
+      </button>
 
       {/* Image Container */}
       <div className="relative aspect-square rounded-xl bg-gradient-to-b from-muted/50 to-muted overflow-hidden mb-3">

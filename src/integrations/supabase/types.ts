@@ -118,6 +118,38 @@ export type Database = {
           },
         ]
       }
+      user_wishlist: {
+        Row: {
+          amiibo_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          amiibo_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          amiibo_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_wishlist_amiibo_id_fkey"
+            columns: ["amiibo_id"]
+            isOneToOne: false
+            referencedRelation: "amiibos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
