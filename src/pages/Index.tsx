@@ -218,22 +218,22 @@ export default function Index() {
   const getUserAmiibo = (amiiboId: string) => 
     userAmiibos.find(ua => ua.amiibo_id === amiiboId);
 
-  // Get first letter for filter (since we no longer have series)
-  const letterList = useMemo(() => {
-    const uniqueLetters = [...new Set(amiibos.map(a => a.name.charAt(0).toUpperCase()))].sort();
-    return uniqueLetters;
+  // Get unique series for filter
+  const seriesList = useMemo(() => {
+    const uniqueSeries = [...new Set(amiibos.map(a => a.series).filter(Boolean))] as string[];
+    return uniqueSeries.sort();
   }, [amiibos]);
 
   const filteredAmiibos = useMemo(() => {
     return amiibos.filter(amiibo => {
       const matchesSearch = amiibo.name.toLowerCase().includes(search.toLowerCase());
       
-      const matchesLetter = selectedSeries === 'all' || amiibo.name.charAt(0).toUpperCase() === selectedSeries;
+      const matchesSeries = selectedSeries === 'all' || amiibo.series === selectedSeries;
       const isInCollection = !!getUserAmiibo(amiibo.id);
       
-      if (filter === 'collected') return matchesSearch && matchesLetter && isInCollection;
-      if (filter === 'missing') return matchesSearch && matchesLetter && !isInCollection;
-      return matchesSearch && matchesLetter;
+      if (filter === 'collected') return matchesSearch && matchesSeries && isInCollection;
+      if (filter === 'missing') return matchesSearch && matchesSeries && !isInCollection;
+      return matchesSearch && matchesSeries;
     });
   }, [amiibos, search, selectedSeries, filter, userAmiibos]);
 
@@ -312,13 +312,13 @@ export default function Index() {
             
             <Select value={selectedSeries} onValueChange={setSelectedSeries}>
               <SelectTrigger className="w-full sm:w-[220px] h-12 rounded-xl border-2 border-border">
-                <SelectValue placeholder="Filtrar por letra" />
+                <SelectValue placeholder="Filtrar por série" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas as letras</SelectItem>
-                {letterList.map(letter => (
-                  <SelectItem key={letter} value={letter}>
-                    {letter}
+                <SelectItem value="all">Todas as séries</SelectItem>
+                {seriesList.map(series => (
+                  <SelectItem key={series} value={series}>
+                    {series}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -351,7 +351,7 @@ export default function Index() {
         {/* Results count */}
         <div className="mb-4 text-sm text-muted-foreground">
           Mostrando {paginatedAmiibos.length} de {filteredAmiibos.length} amiibos
-          {selectedSeries !== 'all' && ` começando com "${selectedSeries}"`}
+          {selectedSeries !== 'all' && ` da série "${selectedSeries}"`}
         </div>
 
         {/* Amiibo Grid */}
