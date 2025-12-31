@@ -84,6 +84,7 @@ export type Database = {
         Row: {
           acquired_at: string | null
           amiibo_id: string
+          condition: string | null
           created_at: string
           id: string
           is_boxed: boolean | null
@@ -93,6 +94,7 @@ export type Database = {
         Insert: {
           acquired_at?: string | null
           amiibo_id: string
+          condition?: string | null
           created_at?: string
           id?: string
           is_boxed?: boolean | null
@@ -102,6 +104,7 @@ export type Database = {
         Update: {
           acquired_at?: string | null
           amiibo_id?: string
+          condition?: string | null
           created_at?: string
           id?: string
           is_boxed?: boolean | null

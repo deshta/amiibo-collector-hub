@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { Check, Plus, Package, PackageOpen, Trash2, Heart } from 'lucide-react';
+import { Check, Plus, Package, PackageOpen, Trash2, Heart, Sparkles, ThumbsUp, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+
+export type AmiiboCondition = 'new' | 'used' | 'damaged';
 
 interface AmiiboCardProps {
   id: string;
@@ -12,6 +14,7 @@ interface AmiiboCardProps {
   isInCollection?: boolean;
   isBoxed?: boolean;
   isInWishlist?: boolean;
+  condition?: AmiiboCondition;
   onAdd?: () => void;
   onRemove?: () => void;
   onToggleBoxed?: () => void;
@@ -35,6 +38,7 @@ export function AmiiboCard({
   isInCollection = false,
   isBoxed = false,
   isInWishlist = false,
+  condition = 'new',
   onAdd,
   onRemove,
   onToggleBoxed,
@@ -42,6 +46,14 @@ export function AmiiboCard({
 }: AmiiboCardProps) {
   const [imageError, setImageError] = useState(false);
   const imageUrl = getImageUrl(imagePath);
+
+  const conditionConfig = {
+    new: { icon: Sparkles, label: 'Novo', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    used: { icon: ThumbsUp, label: 'Usado', color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    damaged: { icon: AlertTriangle, label: 'Danificado', color: 'text-red-500', bg: 'bg-red-500/10' },
+  };
+
+  const ConditionIcon = conditionConfig[condition].icon;
 
   return (
     <div
@@ -65,6 +77,20 @@ export function AmiiboCard({
         <div className="absolute -top-2 -right-2 z-10">
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-pink-500 shadow-md">
             <Heart className="w-4 h-4 text-white fill-white" />
+          </div>
+        </div>
+      )}
+
+      {/* Condition Badge */}
+      {isInCollection && (
+        <div className="absolute top-2 left-2 z-10">
+          <div className={cn(
+            "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shadow-sm",
+            conditionConfig[condition].bg,
+            conditionConfig[condition].color
+          )}>
+            <ConditionIcon className="w-3 h-3" />
+            {conditionConfig[condition].label}
           </div>
         </div>
       )}

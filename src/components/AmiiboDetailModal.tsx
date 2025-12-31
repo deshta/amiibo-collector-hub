@@ -1,4 +1,4 @@
-import { Package, PackageOpen, Calendar, Check, Plus, Trash2, Gamepad2, Heart } from 'lucide-react';
+import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -7,7 +7,16 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+
+export type AmiiboCondition = 'new' | 'used' | 'damaged';
 
 interface AmiiboDetailModalProps {
   amiibo: {
@@ -27,10 +36,12 @@ interface AmiiboDetailModalProps {
   isInCollection?: boolean;
   isBoxed?: boolean;
   isInWishlist?: boolean;
+  condition?: AmiiboCondition;
   onAdd?: () => void;
   onRemove?: () => void;
   onToggleBoxed?: () => void;
   onToggleWishlist?: () => void;
+  onConditionChange?: (condition: AmiiboCondition) => void;
 }
 
 // Helper to get full image URL from storage path
@@ -46,6 +57,12 @@ const formatDate = (date: string | null): string => {
   return new Date(date).toLocaleDateString('pt-BR');
 };
 
+const conditionConfig = {
+  new: { icon: Sparkles, label: 'Novo', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+  used: { icon: ThumbsUp, label: 'Usado', color: 'text-amber-500', bg: 'bg-amber-500/10' },
+  damaged: { icon: AlertTriangle, label: 'Danificado', color: 'text-red-500', bg: 'bg-red-500/10' },
+};
+
 export function AmiiboDetailModal({
   amiibo,
   isOpen,
@@ -53,10 +70,12 @@ export function AmiiboDetailModal({
   isInCollection = false,
   isBoxed = false,
   isInWishlist = false,
+  condition = 'new',
   onAdd,
   onRemove,
   onToggleBoxed,
   onToggleWishlist,
+  onConditionChange,
 }: AmiiboDetailModalProps) {
   if (!amiibo) return null;
 
@@ -156,27 +175,75 @@ export function AmiiboDetailModal({
 
             <div className="flex flex-wrap gap-2 justify-center">
               {isInCollection && (
-                <Badge 
-                  variant={isBoxed ? "default" : "outline"} 
-                  className={cn(
-                    "text-sm",
-                    isBoxed ? "bg-success text-success-foreground" : ""
-                  )}
-                >
-                  {isBoxed ? (
-                    <>
-                      <Package className="w-3 h-3 mr-1" />
-                      Lacrado
-                    </>
-                  ) : (
-                    <>
-                      <PackageOpen className="w-3 h-3 mr-1" />
-                      Aberto
-                    </>
-                  )}
-                </Badge>
+                <>
+                  <Badge 
+                    variant={isBoxed ? "default" : "outline"} 
+                    className={cn(
+                      "text-sm",
+                      isBoxed ? "bg-success text-success-foreground" : ""
+                    )}
+                  >
+                    {isBoxed ? (
+                      <>
+                        <Package className="w-3 h-3 mr-1" />
+                        Lacrado
+                      </>
+                    ) : (
+                      <>
+                        <PackageOpen className="w-3 h-3 mr-1" />
+                        Aberto
+                      </>
+                    )}
+                  </Badge>
+                  <Badge 
+                    variant="outline" 
+                    className={cn(
+                      "text-sm",
+                      conditionConfig[condition].color,
+                      conditionConfig[condition].bg
+                    )}
+                  >
+                    {(() => {
+                      const CondIcon = conditionConfig[condition].icon;
+                      return <CondIcon className="w-3 h-3 mr-1" />;
+                    })()}
+                    {conditionConfig[condition].label}
+                  </Badge>
+                </>
               )}
             </div>
+
+            {/* Condition Selector */}
+            {isInCollection && (
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-sm text-muted-foreground">Condição:</span>
+                <Select value={condition} onValueChange={(value) => onConditionChange?.(value as AmiiboCondition)}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-emerald-500" />
+                        Novo
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="used">
+                      <div className="flex items-center gap-2">
+                        <ThumbsUp className="w-4 h-4 text-amber-500" />
+                        Usado
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="damaged">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-red-500" />
+                        Danificado
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex gap-2 pt-2">
