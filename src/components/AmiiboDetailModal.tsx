@@ -1,4 +1,4 @@
-import { Package, Calendar, Check, Plus, Trash2, Gamepad2, Heart } from 'lucide-react';
+import { Package, PackageOpen, Calendar, Check, Plus, Trash2, Gamepad2, Heart } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -156,9 +156,24 @@ export function AmiiboDetailModal({
 
             <div className="flex flex-wrap gap-2 justify-center">
               {isInCollection && (
-                <Badge variant={isBoxed ? "default" : "outline"} className="text-sm">
-                  <Package className="w-3 h-3 mr-1" />
-                  {isBoxed ? 'Na caixa' : 'Sem caixa'}
+                <Badge 
+                  variant={isBoxed ? "default" : "outline"} 
+                  className={cn(
+                    "text-sm",
+                    isBoxed ? "bg-success text-success-foreground" : ""
+                  )}
+                >
+                  {isBoxed ? (
+                    <>
+                      <Package className="w-3 h-3 mr-1" />
+                      Lacrado
+                    </>
+                  ) : (
+                    <>
+                      <PackageOpen className="w-3 h-3 mr-1" />
+                      Aberto
+                    </>
+                  )}
                 </Badge>
               )}
             </div>
@@ -171,9 +186,19 @@ export function AmiiboDetailModal({
                     variant={isBoxed ? "success" : "secondary"}
                     className="flex-1"
                     onClick={onToggleBoxed}
+                    title={isBoxed ? "Clique para marcar como aberto" : "Clique para marcar como lacrado"}
                   >
-                    <Package className="w-4 h-4 mr-2" />
-                    {isBoxed ? 'Na caixa' : 'Sem caixa'}
+                    {isBoxed ? (
+                      <>
+                        <Package className="w-4 h-4 mr-2" />
+                        Lacrado
+                      </>
+                    ) : (
+                      <>
+                        <PackageOpen className="w-4 h-4 mr-2" />
+                        Marcar como lacrado
+                      </>
+                    )}
                   </Button>
                   <Button
                     variant="destructive"

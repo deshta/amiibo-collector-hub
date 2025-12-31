@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Plus, Package, Trash2, Heart } from 'lucide-react';
+import { Check, Plus, Package, PackageOpen, Trash2, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -111,14 +111,24 @@ export function AmiiboCard({
             <Button
               variant={isBoxed ? "success" : "glass"}
               size="sm"
-              className="flex-1"
+              className="flex-1 gap-1"
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleBoxed?.();
               }}
+              title={isBoxed ? "Clique para marcar como aberto" : "Clique para marcar como lacrado"}
             >
-              <Package className="w-4 h-4" />
-              {isBoxed ? 'Na caixa' : 'Sem caixa'}
+              {isBoxed ? (
+                <>
+                  <Package className="w-4 h-4" />
+                  <span className="text-xs">Lacrado</span>
+                </>
+              ) : (
+                <>
+                  <PackageOpen className="w-4 h-4" />
+                  <span className="text-xs">Aberto</span>
+                </>
+              )}
             </Button>
             <Button
               variant="ghost"
