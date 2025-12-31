@@ -10,7 +10,7 @@ import { SeriesStats } from '@/components/SeriesStats';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Filter, Loader2, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
+import { Search, Filter, Loader2, ChevronLeft, ChevronRight, ArrowUpDown, Heart } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -38,6 +38,11 @@ interface UserAmiibo {
   is_boxed: boolean;
 }
 
+interface WishlistItem {
+  id: string;
+  amiibo_id: string;
+}
+
 const ITEMS_PER_PAGE = 24;
 
 export default function Index() {
@@ -47,9 +52,10 @@ export default function Index() {
   
   const [amiibos, setAmiibos] = useState<Amiibo[]>([]);
   const [userAmiibos, setUserAmiibos] = useState<UserAmiibo[]>([]);
+  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<'all' | 'collected' | 'missing'>('all');
+  const [filter, setFilter] = useState<'all' | 'collected' | 'missing' | 'wishlist'>('all');
   const [selectedSeries, setSelectedSeries] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'name' | 'release_na' | 'release_jp'>('name');
@@ -72,16 +78,19 @@ export default function Index() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [amiibosResult, collectionResult] = await Promise.all([
+      const [amiibosResult, collectionResult, wishlistResult] = await Promise.all([
         supabase.from('amiibos').select('*').order('name'),
         supabase.from('user_amiibos').select('*'),
+        supabase.from('user_wishlist').select('*'),
       ]);
 
       if (amiibosResult.error) throw amiibosResult.error;
       if (collectionResult.error) throw collectionResult.error;
+      if (wishlistResult.error) throw wishlistResult.error;
 
       setAmiibos(amiibosResult.data || []);
       setUserAmiibos(collectionResult.data || []);
+      setWishlist(wishlistResult.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -173,8 +182,56 @@ export default function Index() {
     }
   };
 
+  const toggleWishlist = async (amiiboId: string) => {
+    if (!user) return;
+
+    const isInWishlist = wishlist.some(w => w.amiibo_id === amiiboId);
+
+    try {
+      if (isInWishlist) {
+        const { error } = await supabase
+          .from('user_wishlist')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('amiibo_id', amiiboId);
+
+        if (error) throw error;
+
+        setWishlist(wishlist.filter(w => w.amiibo_id !== amiiboId));
+        toast({
+          title: 'Removido',
+          description: 'Amiibo removido da sua wishlist.',
+        });
+      } else {
+        const { data, error } = await supabase
+          .from('user_wishlist')
+          .insert({ user_id: user.id, amiibo_id: amiiboId })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        setWishlist([...wishlist, data]);
+        toast({
+          title: 'Adicionado!',
+          description: 'Amiibo adicionado à sua wishlist.',
+        });
+      }
+    } catch (error) {
+      console.error('Error updating wishlist:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível atualizar a wishlist.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const getUserAmiibo = (amiiboId: string) => 
     userAmiibos.find(ua => ua.amiibo_id === amiiboId);
+
+  const isInWishlist = (amiiboId: string) => 
+    wishlist.some(w => w.amiibo_id === amiiboId);
 
   // Get unique series for filter
   const seriesList = useMemo(() => {
@@ -194,9 +251,11 @@ export default function Index() {
       const matchesSeries = selectedSeries === 'all' || amiibo.series === selectedSeries;
       const matchesType = selectedType === 'all' || amiibo.type === selectedType;
       const isInCollection = !!getUserAmiibo(amiibo.id);
+      const inWishlist = isInWishlist(amiibo.id);
       
       if (filter === 'collected') return matchesSearch && matchesSeries && matchesType && isInCollection;
       if (filter === 'missing') return matchesSearch && matchesSeries && matchesType && !isInCollection;
+      if (filter === 'wishlist') return matchesSearch && matchesSeries && matchesType && inWishlist;
       return matchesSearch && matchesSeries && matchesType;
     });
 
@@ -214,7 +273,7 @@ export default function Index() {
       
       return sortOrder === 'asc' ? comparison : -comparison;
     });
-  }, [amiibos, search, selectedSeries, selectedType, filter, userAmiibos, sortBy, sortOrder]);
+  }, [amiibos, search, selectedSeries, selectedType, filter, userAmiibos, wishlist, sortBy, sortOrder]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAmiibos.length / ITEMS_PER_PAGE);
@@ -355,6 +414,19 @@ export default function Index() {
             >
               Faltando
             </Button>
+            <Button
+              variant={filter === 'wishlist' ? 'default' : 'glass'}
+              onClick={() => setFilter('wishlist')}
+              className={filter === 'wishlist' ? '' : 'hover:text-pink-500'}
+            >
+              <Heart className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Wishlist</span>
+              {wishlist.length > 0 && (
+                <span className="ml-1 text-xs bg-pink-500/20 text-pink-500 px-1.5 py-0.5 rounded-full">
+                  {wishlist.length}
+                </span>
+              )}
+            </Button>
           </div>
         </div>
         
@@ -384,9 +456,11 @@ export default function Index() {
                     type={amiibo.type}
                     isInCollection={!!userAmiibo}
                     isBoxed={userAmiibo?.is_boxed || false}
+                    isInWishlist={isInWishlist(amiibo.id)}
                     onAdd={() => addToCollection(amiibo.id)}
                     onRemove={() => removeFromCollection(amiibo.id)}
                     onToggleBoxed={() => toggleBoxed(amiibo.id, userAmiibo?.is_boxed || false)}
+                    onToggleWishlist={() => toggleWishlist(amiibo.id)}
                   />
                 </div>
               );
