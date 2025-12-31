@@ -1,4 +1,1 @@
 project_id = "qlqxczezbpchjnkjwyrd"
-
-[functions.import-amiibos]
-verify_jwt = false

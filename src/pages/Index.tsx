@@ -10,7 +10,7 @@ import { SeriesStats } from '@/components/SeriesStats';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Filter, Loader2, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -49,7 +49,6 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'collected' | 'missing'>('all');
-  const [syncing, setSyncing] = useState(false);
   const [selectedSeries, setSelectedSeries] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedAmiibo, setSelectedAmiibo] = useState<Amiibo | null>(null);
@@ -88,52 +87,6 @@ export default function Index() {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const importAmiibos = async () => {
-    setSyncing(true);
-    try {
-      // Fetch the JSON data from public folder
-      const [amiiboResponse, seriesResponse] = await Promise.all([
-        fetch('/data/amiibo-data.json'),
-        fetch('/data/amiibo-series.json')
-      ]);
-      
-      if (!amiiboResponse.ok) throw new Error('Falha ao carregar dados de amiibos');
-      if (!seriesResponse.ok) throw new Error('Falha ao carregar dados de séries');
-      
-      const amiiboData = await amiiboResponse.json();
-      const seriesData = await seriesResponse.json();
-      
-      // Merge amiibo data with series mapping
-      const mergedData = {
-        ...amiiboData,
-        game_series: seriesData.game_series
-      };
-      
-      // Call the edge function to import
-      const { data, error } = await supabase.functions.invoke('import-amiibos', {
-        body: mergedData
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: 'Importação concluída!',
-        description: data.message,
-      });
-      
-      await fetchData();
-    } catch (error) {
-      console.error('Error importing:', error);
-      toast({
-        title: 'Erro na importação',
-        description: 'Não foi possível importar os amiibos.',
-        variant: 'destructive',
-      });
-    } finally {
-      setSyncing(false);
     }
   };
 
@@ -281,14 +234,6 @@ export default function Index() {
               Gerencie seus Amiibos Nintendo
             </p>
           </div>
-          <Button
-            variant="secondary"
-            onClick={importAmiibos}
-            disabled={syncing}
-          >
-            <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-            {syncing ? 'Importando...' : 'Importar Catálogo'}
-          </Button>
         </div>
 
         {/* Stats */}
