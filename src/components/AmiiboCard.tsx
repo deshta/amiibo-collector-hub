@@ -82,21 +82,6 @@ export function AmiiboCard({
           </div>
         </div>
       )}
-
-      {/* Condition Badge */}
-      {isInCollection && (
-        <div className="absolute top-2 left-2 z-10">
-          <div className={cn(
-            "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shadow-sm",
-            conditionConfig[condition].bg,
-            conditionConfig[condition].color
-          )}>
-            <ConditionIcon className="w-3 h-3" />
-            {conditionConfig[condition].label}
-          </div>
-        </div>
-      )}
-
       {/* Image Container */}
       <div className="relative aspect-square rounded-xl bg-gradient-to-b from-muted/50 to-muted overflow-hidden mb-3">
         {imageUrl && !imageError ? (
@@ -115,17 +100,32 @@ export function AmiiboCard({
 
       {/* Info */}
       <div className="space-y-2 mb-3 min-h-[72px]">
-        <h3 className="font-bold text-foreground text-base leading-snug min-h-[40px] line-clamp-2">
+        <h3 className="font-bold text-foreground text-base leading-snug min-h-[40px] line-clamp-2 text-center">
           {name}
         </h3>
-        <div className="flex items-center gap-2 flex-wrap">
+        
+        {/* Condition Badge - below name, centered */}
+        {isInCollection && (
+          <div className="flex justify-center">
+            <div className={cn(
+              "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shadow-sm",
+              conditionConfig[condition].bg,
+              conditionConfig[condition].color
+            )}>
+              <ConditionIcon className="w-3 h-3" />
+              {conditionConfig[condition].label}
+            </div>
+          </div>
+        )}
+        
+        <div className="flex items-center gap-2 flex-wrap justify-center">
           {type && (
             <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium whitespace-nowrap">
               {type}
             </span>
           )}
           {series && (
-            <p className="text-xs text-muted-foreground line-clamp-1 truncate flex-1">
+            <p className="text-xs text-muted-foreground line-clamp-1 truncate flex-1 text-center">
               {series}
             </p>
           )}
