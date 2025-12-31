@@ -8,10 +8,10 @@ import { AmiiboCard } from '@/components/AmiiboCard';
 import { AmiiboDetailModal } from '@/components/AmiiboDetailModal';
 import { CollectionStats } from '@/components/CollectionStats';
 import { SeriesStats } from '@/components/SeriesStats';
-import { Input } from '@/components/ui/input';
+import { SearchAutocomplete } from '@/components/SearchAutocomplete';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Filter, Loader2, ChevronLeft, ChevronRight, ArrowUpDown, Heart, X } from 'lucide-react';
+import { Filter, Loader2, ChevronLeft, ChevronRight, ArrowUpDown, Heart, X } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -469,15 +469,13 @@ export default function Index() {
         {/* Search & Filter */}
         <div className="flex flex-col gap-4 mb-8 animate-slide-up" style={{ animationDelay: '200ms' }}>
           <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                placeholder={t('index.searchPlaceholder')}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-11 h-12 rounded-xl border-2 border-border focus:border-primary"
-              />
-            </div>
+            <SearchAutocomplete
+              amiibos={amiibos}
+              value={search}
+              onChange={setSearch}
+              onSelect={(amiibo) => setSelectedAmiibo(amiibo as any)}
+              placeholder={t('index.searchPlaceholder')}
+            />
             
             <Select value={selectedSeries} onValueChange={setSelectedSeries}>
               <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-xl border-2 border-border">
