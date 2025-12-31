@@ -52,13 +52,13 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, onSeriesClic
   if (seriesStats.length === 0) return null;
 
   return (
-    <div className="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-8 animate-slide-up" style={{ animationDelay: '150ms' }}>
-      <div className="flex items-center gap-2 mb-3 sm:mb-4">
-        <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-        <h2 className="text-base sm:text-lg font-bold text-foreground">{t('stats.collectionProgress')}</h2>
+    <div className="glass-card rounded-2xl p-6 mb-8 animate-slide-up" style={{ animationDelay: '150ms' }}>
+      <div className="flex items-center gap-2 mb-4">
+        <Gamepad2 className="w-5 h-5 text-primary" />
+        <h2 className="text-lg font-bold text-foreground">{t('stats.collectionProgress')}</h2>
       </div>
       
-      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 max-h-[300px] sm:max-h-[400px] overflow-y-auto p-1 -m-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-1 -m-1">
         {seriesStats.map((series) => {
           const isNoSeries = series.name === t('stats.noSeries');
           const filterValue = isNoSeries ? 'all' : series.name;
@@ -67,7 +67,7 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, onSeriesClic
           return (
             <div 
               key={series.name} 
-              className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all cursor-pointer ${
+              className={`p-3 rounded-xl transition-all cursor-pointer ${
                 isSelected 
                   ? 'bg-primary/20 ring-2 ring-primary' 
                   : 'bg-muted/30 hover:bg-muted/50'
@@ -75,17 +75,17 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, onSeriesClic
               onClick={() => onSeriesClick?.(selectedSeries === series.name ? 'all' : (isNoSeries ? 'all' : series.name))}
               title={`Filtrar por ${series.name}`}
             >
-            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-              <span className="font-medium text-foreground text-xs sm:text-sm truncate flex-1 mr-2">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-medium text-foreground text-sm truncate flex-1 mr-2">
                 {series.name}
               </span>
-              <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
+              <span className="text-xs text-muted-foreground whitespace-nowrap">
                 {series.collected}/{series.total}
               </span>
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Progress value={series.percentage} className="h-1.5 sm:h-2 flex-1" />
-              <span className="text-[10px] sm:text-xs font-medium text-primary w-8 sm:w-10 text-right">
+            <div className="flex items-center gap-2">
+              <Progress value={series.percentage} className="h-2 flex-1" />
+              <span className="text-xs font-medium text-primary w-10 text-right">
                 {series.percentage}%
               </span>
             </div>

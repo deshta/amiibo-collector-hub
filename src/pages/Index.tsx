@@ -410,15 +410,17 @@ export default function Index() {
     <div className="min-h-screen bg-gradient-hero">
       <Header />
       
-      <main className="container px-3 sm:px-6 py-4 sm:py-8">
+      <main className="container py-8">
         {/* Title */}
-        <div className="flex flex-col gap-2 mb-4 sm:mb-8 animate-slide-up">
-          <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-foreground">
-            {t('index.myCollection')}
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            {t('index.manageAmiibos')}
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 animate-slide-up">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">
+              {t('index.myCollection')}
+            </h1>
+            <p className="text-muted-foreground">
+              {t('index.manageAmiibos')}
+            </p>
+          </div>
         </div>
 
         {/* Stats */}
@@ -448,22 +450,20 @@ export default function Index() {
         />
 
         {/* Search & Filter */}
-        <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-8 animate-slide-up" style={{ animationDelay: '200ms' }}>
-          {/* Search input */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
-            <Input
-              placeholder={t('index.searchPlaceholder')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 sm:pl-11 h-10 sm:h-12 rounded-xl border-2 border-border focus:border-primary text-sm sm:text-base"
-            />
-          </div>
-          
-          {/* Filters row - horizontal scroll on mobile */}
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible">
+        <div className="flex flex-col gap-4 mb-8 animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Input
+                placeholder={t('index.searchPlaceholder')}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-11 h-12 rounded-xl border-2 border-border focus:border-primary"
+              />
+            </div>
+            
             <Select value={selectedSeries} onValueChange={setSelectedSeries}>
-              <SelectTrigger className="min-w-[140px] sm:min-w-[180px] h-10 sm:h-12 rounded-xl border-2 border-border text-sm shrink-0">
+              <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-xl border-2 border-border">
                 <SelectValue placeholder={t('index.filterBySeries')} />
               </SelectTrigger>
               <SelectContent>
@@ -477,7 +477,7 @@ export default function Index() {
             </Select>
 
             <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="min-w-[120px] sm:min-w-[150px] h-10 sm:h-12 rounded-xl border-2 border-border text-sm shrink-0">
+              <SelectTrigger className="w-full sm:w-[150px] h-12 rounded-xl border-2 border-border">
                 <SelectValue placeholder={t('index.filterByType')} />
               </SelectTrigger>
               <SelectContent>
@@ -491,7 +491,7 @@ export default function Index() {
             </Select>
 
             <Select value={sortBy} onValueChange={(value: 'name' | 'release_na' | 'release_jp') => setSortBy(value)}>
-              <SelectTrigger className="min-w-[140px] sm:min-w-[180px] h-10 sm:h-12 rounded-xl border-2 border-border text-sm shrink-0">
+              <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-xl border-2 border-border">
                 <ArrowUpDown className="w-4 h-4 mr-2" />
                 <SelectValue placeholder={t('index.sortByName')} />
               </SelectTrigger>
@@ -505,7 +505,7 @@ export default function Index() {
             <Button
               variant="glass"
               size="icon"
-              className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl border-2 border-border shrink-0"
+              className="h-12 w-12 rounded-xl border-2 border-border"
               onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
               title={sortOrder === 'asc' ? t('index.ascending') : t('index.descending')}
             >
@@ -513,40 +513,32 @@ export default function Index() {
             </Button>
           </div>
           
-          {/* Filter buttons - horizontal scroll on mobile */}
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant={filter === 'all' ? 'default' : 'glass'}
               onClick={() => setFilter('all')}
-              size="sm"
-              className="h-9 sm:h-10 text-xs sm:text-sm shrink-0"
             >
-              <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+              <Filter className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">{t('index.all')}</span>
             </Button>
             <Button
               variant={filter === 'collected' ? 'default' : 'glass'}
               onClick={() => setFilter('collected')}
-              size="sm"
-              className="h-9 sm:h-10 text-xs sm:text-sm shrink-0"
             >
               {t('index.collected')}
             </Button>
             <Button
               variant={filter === 'missing' ? 'default' : 'glass'}
               onClick={() => setFilter('missing')}
-              size="sm"
-              className="h-9 sm:h-10 text-xs sm:text-sm shrink-0"
             >
               {t('index.missing')}
             </Button>
             <Button
               variant={filter === 'wishlist' ? 'default' : 'glass'}
               onClick={() => setFilter('wishlist')}
-              size="sm"
-              className={`h-9 sm:h-10 text-xs sm:text-sm shrink-0 ${filter === 'wishlist' ? '' : 'hover:text-pink-500'}`}
+              className={filter === 'wishlist' ? '' : 'hover:text-pink-500'}
             >
-              <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+              <Heart className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">{t('index.wishlist')}</span>
               {wishlist.length > 0 && (
                 <span className="ml-1 text-xs bg-pink-500/20 text-pink-500 px-1.5 py-0.5 rounded-full">
@@ -558,14 +550,14 @@ export default function Index() {
         </div>
         
         {/* Results count */}
-        <div id="amiibo-grid" className="mb-3 sm:mb-4 text-xs sm:text-sm text-muted-foreground scroll-mt-4">
+        <div id="amiibo-grid" className="mb-4 text-sm text-muted-foreground scroll-mt-4">
           {t('index.showing')} {paginatedAmiibos.length} {t('index.of')} {filteredAmiibos.length} {t('index.amiibos')}
           {selectedSeries !== 'all' && ` ${t('index.fromSeries')} "${selectedSeries}"`}
         </div>
 
         {/* Amiibo Grid */}
         {paginatedAmiibos.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
             {paginatedAmiibos.map((amiibo, index) => {
               const userAmiibo = getUserAmiibo(amiibo.id);
               return (
@@ -607,11 +599,11 @@ export default function Index() {
 
         {/* Pagination */}
         {totalPages >= 1 && (
-          <div className="flex flex-col items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             {/* Items per page selector */}
             <div className="flex items-center gap-2">
               <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                <SelectTrigger className="w-[80px] sm:w-[100px] h-9 sm:h-10 rounded-xl border-2 border-border text-sm">
+                <SelectTrigger className="w-[100px] h-10 rounded-xl border-2 border-border">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -622,57 +614,55 @@ export default function Index() {
                   ))}
                 </SelectContent>
               </Select>
-              <span className="text-xs sm:text-sm text-muted-foreground">{t('index.itemsPerPage')}</span>
+              <span className="text-sm text-muted-foreground">{t('index.itemsPerPage')}</span>
             </div>
 
             {totalPages > 1 && (
-              <div className="flex items-center gap-1 sm:gap-2">
-                <Button
-                  variant="glass"
-                  size="icon"
-                  className="h-8 w-8 sm:h-10 sm:w-10"
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
+              <div className="flex items-center gap-2">
+            <Button
+              variant="glass"
+              size="icon"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum: number;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
                 
-                <div className="flex items-center gap-0.5 sm:gap-1">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum: number;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    return (
-                      <Button
-                        key={pageNum}
-                        variant={currentPage === pageNum ? 'default' : 'glass'}
-                        size="icon"
-                        onClick={() => setCurrentPage(pageNum)}
-                        className="w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm"
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
-                </div>
-                
-                <Button
-                  variant="glass"
-                  size="icon"
-                  className="h-8 w-8 sm:h-10 sm:w-10"
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={currentPage === pageNum ? 'default' : 'glass'}
+                    size="icon"
+                    onClick={() => setCurrentPage(pageNum)}
+                    className="w-10 h-10"
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+            </div>
+            
+            <Button
+              variant="glass"
+              size="icon"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
               </div>
             )}
           </div>

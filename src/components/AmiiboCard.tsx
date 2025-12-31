@@ -60,85 +60,85 @@ export function AmiiboCard({
   return (
     <div
       className={cn(
-        "group relative glass-card rounded-xl sm:rounded-2xl p-2.5 sm:p-4 transition-all duration-300 animate-scale-in",
+        "group relative glass-card rounded-2xl p-4 transition-all duration-300 animate-scale-in",
         "hover:shadow-lg hover:-translate-y-1",
         isInCollection && "ring-2 ring-success/50"
       )}
     >
       {/* Collection Badge */}
       {isInCollection && (
-        <div className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 z-10">
-          <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-success shadow-md">
-            <Check className="w-3 h-3 sm:w-4 sm:h-4 text-success-foreground" />
+        <div className="absolute -top-2 -right-2 z-10">
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-success shadow-md">
+            <Check className="w-4 h-4 text-success-foreground" />
           </div>
         </div>
       )}
 
       {/* Wishlist Badge */}
       {isInWishlist && !isInCollection && (
-        <div className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 z-10">
-          <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-pink-500 shadow-md">
-            <Heart className="w-3 h-3 sm:w-4 sm:h-4 text-white fill-white" />
+        <div className="absolute -top-2 -right-2 z-10">
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-pink-500 shadow-md">
+            <Heart className="w-4 h-4 text-white fill-white" />
           </div>
         </div>
       )}
       {/* Image Container */}
-      <div className="relative aspect-square rounded-lg sm:rounded-xl bg-gradient-to-b from-muted/50 to-muted overflow-hidden mb-2 sm:mb-3">
+      <div className="relative aspect-square rounded-xl bg-gradient-to-b from-muted/50 to-muted overflow-hidden mb-3">
         {imageUrl && !imageError ? (
           <img
             src={imageUrl}
             alt={name}
-            className="w-full h-full object-contain p-2 sm:p-4 transition-transform duration-300 group-hover:scale-110"
+            className="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-110"
             onError={() => setImageError(true)}
           />
         ) : (
           <div className="flex items-center justify-center h-full">
-            <Package className="w-10 h-10 sm:w-16 sm:h-16 text-muted-foreground/50" />
+            <Package className="w-16 h-16 text-muted-foreground/50" />
           </div>
         )}
       </div>
 
       {/* Info */}
-      <div className="space-y-0.5 sm:space-y-1 mb-2 sm:mb-3 min-h-[56px] sm:min-h-[72px]">
-        <h3 className="font-bold text-foreground text-xs sm:text-base leading-snug line-clamp-2 text-center">
+      <div className="space-y-1 mb-3 min-h-[72px]">
+        <h3 className="font-bold text-foreground text-base leading-snug line-clamp-2 text-center">
           {name}
         </h3>
         
         {/* Series - below name, centered */}
         {series && (
-          <p className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1 text-center">
+          <p className="text-xs text-muted-foreground line-clamp-1 text-center -mt-0.5">
             {series}
           </p>
         )}
         
         {/* Type and Condition badges */}
-        <div className="flex items-center gap-1 sm:gap-2 flex-wrap justify-center mt-1.5 sm:mt-3">
+        <div className="flex items-center gap-2 flex-wrap justify-center mt-3">
           {type && (
-            <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium whitespace-nowrap">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium whitespace-nowrap">
               {type}
             </span>
           )}
           {isInCollection && (
             <div className={cn(
-              "flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium",
+              "flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium",
               conditionConfig[condition].bg,
               conditionConfig[condition].color
             )}>
-              <ConditionIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-              <span className="hidden xs:inline">{conditionConfig[condition].label}</span>
+              <ConditionIcon className="w-3 h-3" />
+              {conditionConfig[condition].label}
             </div>
           )}
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex gap-1.5 sm:gap-2">
+      <div className="flex gap-2">
         {isInCollection ? (
           <>
             <Button
               variant={isBoxed ? "success" : "glass"}
               size="sm"
-              className="flex-1 gap-0.5 sm:gap-1 h-8 sm:h-9 text-[10px] sm:text-xs px-2 sm:px-3"
+              className="flex-1 gap-1"
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleBoxed?.();
@@ -147,26 +147,26 @@ export function AmiiboCard({
             >
               {isBoxed ? (
                 <>
-                  <Package className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden xs:inline">{t('card.boxed')}</span>
+                  <Package className="w-4 h-4" />
+                  <span className="text-xs">{t('card.boxed')}</span>
                 </>
               ) : (
                 <>
-                  <PackageOpen className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden xs:inline">{t('card.unboxed')}</span>
+                  <PackageOpen className="w-4 h-4" />
+                  <span className="text-xs">{t('card.unboxed')}</span>
                 </>
               )}
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
               onClick={(e) => {
                 e.stopPropagation();
                 onRemove?.();
               }}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
             >
-              <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-destructive" />
+              <Trash2 className="w-4 h-4" />
             </Button>
           </>
         ) : (
@@ -174,31 +174,30 @@ export function AmiiboCard({
             <Button
               variant="default"
               size="sm"
-              className="flex-1 h-8 sm:h-9 text-[10px] sm:text-xs gap-0.5 sm:gap-1"
+              className="flex-1"
               onClick={(e) => {
                 e.stopPropagation();
                 onAdd?.();
               }}
             >
-              <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline">{t('card.add')}</span>
+              <Plus className="w-4 h-4" />
+              {t('card.add')}
             </Button>
             <Button
               variant={isInWishlist ? "default" : "ghost"}
               size="sm"
-              className={cn(
-                "h-8 w-8 sm:h-9 sm:w-9 p-0",
-                isInWishlist 
-                  ? "bg-pink-500 hover:bg-pink-600 text-white" 
-                  : "text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10"
-              )}
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleWishlist?.();
               }}
+              className={cn(
+                isInWishlist 
+                  ? "bg-pink-500 hover:bg-pink-600 text-white" 
+                  : "text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10"
+              )}
               title={isInWishlist ? t('card.removeFromWishlist') : t('card.addToWishlist')}
             >
-              <Heart className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4", isInWishlist && "fill-current")} />
+              <Heart className={cn("w-4 h-4", isInWishlist && "fill-current")} />
             </Button>
           </>
         )}

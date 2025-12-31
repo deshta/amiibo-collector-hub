@@ -21,49 +21,44 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-lg">
-        <div className="container flex h-14 sm:h-16 items-center justify-between px-3 sm:px-6">
-          <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
-            <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-nintendo shadow-md transition-transform group-hover:scale-105">
-              <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
+        <div className="container flex h-16 items-center justify-between">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-nintendo shadow-md transition-transform group-hover:scale-105">
+              <Gamepad2 className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-extrabold text-base sm:text-xl text-foreground hidden xs:inline">
+            <span className="font-extrabold text-xl text-foreground">
               Amiibo Collection
             </span>
           </Link>
 
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-2">
             <LanguageSwitcher />
             
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="rounded-full h-8 w-8 sm:h-9 sm:w-9"
+              className="rounded-full"
               aria-label={t('header.toggleTheme')}
             >
-              <Sun className="h-4 w-4 sm:h-5 sm:w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 sm:h-5 sm:w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </Button>
 
             {user && (
               <>
                 <Button 
                   variant="ghost" 
-                  size="icon"
+                  size="sm" 
                   onClick={() => setShowProfile(true)}
-                  className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 sm:gap-2"
+                  className="gap-2"
                 >
                   <User className="w-4 h-4" />
-                  <span className="hidden sm:inline text-sm">{user.email}</span>
+                  <span className="hidden sm:inline">{user.email}</span>
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={signOut}
-                  className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3"
-                >
+                <Button variant="ghost" size="sm" onClick={signOut}>
                   <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline ml-2 text-sm">{t('header.signOut')}</span>
+                  <span className="hidden sm:inline ml-2">{t('header.signOut')}</span>
                 </Button>
               </>
             )}
