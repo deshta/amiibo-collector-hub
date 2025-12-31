@@ -1,4 +1,4 @@
-import { Package, Calendar, X, Check, Plus, Trash2 } from 'lucide-react';
+import { Package, Calendar, Check, Plus, Trash2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -12,9 +12,12 @@ interface AmiiboDetailModalProps {
   amiibo: {
     id: string;
     name: string;
-    series: string;
-    character_name: string;
-    image_url: string | null;
+    amiibo_hex_id: string | null;
+    image_path: string | null;
+    release_au: string | null;
+    release_na: string | null;
+    release_eu: string | null;
+    release_jp: string | null;
   } | null;
   isOpen: boolean;
   onClose: () => void;
@@ -24,6 +27,19 @@ interface AmiiboDetailModalProps {
   onRemove?: () => void;
   onToggleBoxed?: () => void;
 }
+
+// Helper to get full image URL from storage path
+const getImageUrl = (imagePath: string | null): string | null => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith('http')) return imagePath;
+  return `https://qlqxczezbpchjnkjwyrd.supabase.co/storage/v1/object/public/amiibo-images/${imagePath}`;
+};
+
+// Format date for display
+const formatDate = (date: string | null): string => {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString('pt-BR');
+};
 
 export function AmiiboDetailModal({
   amiibo,
@@ -37,6 +53,8 @@ export function AmiiboDetailModal({
 }: AmiiboDetailModalProps) {
   if (!amiibo) return null;
 
+  const imageUrl = getImageUrl(amiibo.image_path);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -47,9 +65,9 @@ export function AmiiboDetailModal({
         <div className="flex flex-col items-center gap-6">
           {/* Image */}
           <div className="relative w-48 h-48 rounded-2xl bg-gradient-to-b from-muted/50 to-muted overflow-hidden">
-            {amiibo.image_url ? (
+            {imageUrl ? (
               <img
-                src={amiibo.image_url}
+                src={imageUrl}
                 alt={amiibo.name}
                 className="w-full h-full object-contain p-4"
               />
@@ -71,15 +89,31 @@ export function AmiiboDetailModal({
 
           {/* Info */}
           <div className="w-full space-y-4">
+            {/* Release dates */}
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <span className="text-muted-foreground">JP:</span>
+                <span>{formatDate(amiibo.release_jp)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <span className="text-muted-foreground">NA:</span>
+                <span>{formatDate(amiibo.release_na)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <span className="text-muted-foreground">EU:</span>
+                <span>{formatDate(amiibo.release_eu)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <span className="text-muted-foreground">AU:</span>
+                <span>{formatDate(amiibo.release_au)}</span>
+              </div>
+            </div>
+
             <div className="flex flex-wrap gap-2 justify-center">
-              <Badge variant="secondary" className="text-sm">
-                {amiibo.series}
-              </Badge>
-              {amiibo.character_name !== amiibo.name && (
-                <Badge variant="outline" className="text-sm">
-                  {amiibo.character_name}
-                </Badge>
-              )}
               {isInCollection && (
                 <Badge variant={isBoxed ? "default" : "outline"} className="text-sm">
                   <Package className="w-3 h-3 mr-1" />

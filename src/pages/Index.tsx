@@ -21,9 +21,12 @@ import {
 interface Amiibo {
   id: string;
   name: string;
-  series: string;
-  character_name: string;
-  image_url: string | null;
+  amiibo_hex_id: string | null;
+  image_path: string | null;
+  release_au: string | null;
+  release_na: string | null;
+  release_eu: string | null;
+  release_jp: string | null;
 }
 
 interface UserAmiibo {
@@ -86,69 +89,33 @@ export default function Index() {
     }
   };
 
-  const syncAmiibos = async () => {
+  const importAmiibos = async () => {
     setSyncing(true);
     try {
-      const response = await fetch('https://www.amiiboapi.com/api/amiibo/');
-      if (!response.ok) throw new Error('Falha ao buscar dados');
+      // Fetch the JSON data from public folder
+      const response = await fetch('/data/amiibo-data.json');
+      if (!response.ok) throw new Error('Falha ao carregar dados');
       
-      const data = await response.json();
-      const amiibosFromApi = data.amiibo as Array<{
-        name: string;
-        amiiboSeries: string;
-        character: string;
-        image: string;
-        release: { jp: string | null; na: string | null; eu: string | null; au: string | null };
-      }>;
-
-      // Get unique amiibos by name + series
-      const uniqueMap = new Map<string, typeof amiibosFromApi[0]>();
-      amiibosFromApi.forEach(a => {
-        const key = `${a.name}-${a.amiiboSeries}`;
-        if (!uniqueMap.has(key)) {
-          uniqueMap.set(key, a);
-        }
+      const jsonData = await response.json();
+      
+      // Call the edge function to import
+      const { data, error } = await supabase.functions.invoke('import-amiibos', {
+        body: jsonData
       });
 
-      const uniqueAmiibos = Array.from(uniqueMap.values());
-      
-      // Transform data
-      const newAmiibos = uniqueAmiibos.map(a => {
-        const dates = [a.release.jp, a.release.na, a.release.eu, a.release.au].filter(Boolean).sort();
-        return {
-          name: a.name,
-          series: a.amiiboSeries,
-          character_name: a.character,
-          image_url: a.image,
-          release_date: dates.length > 0 ? dates[0] : null,
-        };
-      });
-
-      // Insert new amiibos (upsert by checking existing)
-      const existingNames = new Set(amiibos.map(a => `${a.name}-${a.series}`));
-      const toInsert = newAmiibos.filter(a => !existingNames.has(`${a.name}-${a.series}`));
-
-      if (toInsert.length > 0) {
-        // Insert in batches
-        const batchSize = 50;
-        for (let i = 0; i < toInsert.length; i += batchSize) {
-          const batch = toInsert.slice(i, i + batchSize);
-          const { error } = await supabase.from('amiibos').insert(batch);
-          if (error) throw error;
-        }
-      }
+      if (error) throw error;
 
       toast({
-        title: 'Catálogo sincronizado!',
-        description: `${toInsert.length} novos amiibos adicionados. Total: ${uniqueAmiibos.length}`,
+        title: 'Importação concluída!',
+        description: data.message,
       });
       
       await fetchData();
     } catch (error) {
-      console.error('Error syncing:', error);
+      console.error('Error importing:', error);
       toast({
-        title: 'Erro na sincronização',
-        description: 'Não foi possível sincronizar o catálogo.',
+        title: 'Erro na importação',
+        description: 'Não foi possível importar os amiibos.',
         variant: 'destructive',
       });
     } finally {
@@ -238,25 +205,22 @@ export default function Index() {
   const getUserAmiibo = (amiiboId: string) => 
     userAmiibos.find(ua => ua.amiibo_id === amiiboId);
 
-  // Get unique series for filter
-  const seriesList = useMemo(() => {
-    const uniqueSeries = [...new Set(amiibos.map(a => a.series))].sort();
-    return uniqueSeries;
+  // Get first letter for filter (since we no longer have series)
+  const letterList = useMemo(() => {
+    const uniqueLetters = [...new Set(amiibos.map(a => a.name.charAt(0).toUpperCase()))].sort();
+    return uniqueLetters;
   }, [amiibos]);
 
   const filteredAmiibos = useMemo(() => {
     return amiibos.filter(amiibo => {
-      const matchesSearch = 
-        amiibo.name.toLowerCase().includes(search.toLowerCase()) ||
-        amiibo.series.toLowerCase().includes(search.toLowerCase()) ||
-        amiibo.character_name.toLowerCase().includes(search.toLowerCase());
+      const matchesSearch = amiibo.name.toLowerCase().includes(search.toLowerCase());
       
-      const matchesSeries = selectedSeries === 'all' || amiibo.series === selectedSeries;
+      const matchesLetter = selectedSeries === 'all' || amiibo.name.charAt(0).toUpperCase() === selectedSeries;
       const isInCollection = !!getUserAmiibo(amiibo.id);
       
-      if (filter === 'collected') return matchesSearch && matchesSeries && isInCollection;
-      if (filter === 'missing') return matchesSearch && matchesSeries && !isInCollection;
-      return matchesSearch && matchesSeries;
+      if (filter === 'collected') return matchesSearch && matchesLetter && isInCollection;
+      if (filter === 'missing') return matchesSearch && matchesLetter && !isInCollection;
+      return matchesSearch && matchesLetter;
     });
   }, [amiibos, search, selectedSeries, filter, userAmiibos]);
 
@@ -305,11 +269,11 @@ export default function Index() {
           </div>
           <Button
             variant="secondary"
-            onClick={syncAmiibos}
+            onClick={importAmiibos}
             disabled={syncing}
           >
             <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-            {syncing ? 'Sincronizando...' : 'Sincronizar Catálogo'}
+            {syncing ? 'Importando...' : 'Importar Catálogo'}
           </Button>
         </div>
 
@@ -335,13 +299,13 @@ export default function Index() {
             
             <Select value={selectedSeries} onValueChange={setSelectedSeries}>
               <SelectTrigger className="w-full sm:w-[220px] h-12 rounded-xl border-2 border-border">
-                <SelectValue placeholder="Filtrar por série" />
+                <SelectValue placeholder="Filtrar por letra" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas as séries</SelectItem>
-                {seriesList.map(series => (
-                  <SelectItem key={series} value={series}>
-                    {series}
+                <SelectItem value="all">Todas as letras</SelectItem>
+                {letterList.map(letter => (
+                  <SelectItem key={letter} value={letter}>
+                    {letter}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -374,7 +338,7 @@ export default function Index() {
         {/* Results count */}
         <div className="mb-4 text-sm text-muted-foreground">
           Mostrando {paginatedAmiibos.length} de {filteredAmiibos.length} amiibos
-          {selectedSeries !== 'all' && ` em "${selectedSeries}"`}
+          {selectedSeries !== 'all' && ` começando com "${selectedSeries}"`}
         </div>
 
         {/* Amiibo Grid */}
@@ -392,9 +356,7 @@ export default function Index() {
                   <AmiiboCard
                     id={amiibo.id}
                     name={amiibo.name}
-                    series={amiibo.series}
-                    characterName={amiibo.character_name}
-                    imageUrl={amiibo.image_url}
+                    imagePath={amiibo.image_path}
                     isInCollection={!!userAmiibo}
                     isBoxed={userAmiibo?.is_boxed || false}
                     onAdd={() => addToCollection(amiibo.id)}
