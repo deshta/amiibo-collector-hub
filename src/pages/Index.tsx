@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,7 +8,14 @@ import { CollectionStats } from '@/components/CollectionStats';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Filter, Loader2, RefreshCw } from 'lucide-react';
+import { Search, Filter, Loader2, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface Amiibo {
   id: string;
@@ -24,6 +31,8 @@ interface UserAmiibo {
   is_boxed: boolean;
 }
 
+const ITEMS_PER_PAGE = 24;
+
 export default function Index() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -35,6 +44,8 @@ export default function Index() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'collected' | 'missing'>('all');
   const [syncing, setSyncing] = useState(false);
+  const [selectedSeries, setSelectedSeries] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -225,18 +236,39 @@ export default function Index() {
   const getUserAmiibo = (amiiboId: string) => 
     userAmiibos.find(ua => ua.amiibo_id === amiiboId);
 
-  const filteredAmiibos = amiibos.filter(amiibo => {
-    const matchesSearch = 
-      amiibo.name.toLowerCase().includes(search.toLowerCase()) ||
-      amiibo.series.toLowerCase().includes(search.toLowerCase()) ||
-      amiibo.character_name.toLowerCase().includes(search.toLowerCase());
-    
-    const isInCollection = !!getUserAmiibo(amiibo.id);
-    
-    if (filter === 'collected') return matchesSearch && isInCollection;
-    if (filter === 'missing') return matchesSearch && !isInCollection;
-    return matchesSearch;
-  });
+  // Get unique series for filter
+  const seriesList = useMemo(() => {
+    const uniqueSeries = [...new Set(amiibos.map(a => a.series))].sort();
+    return uniqueSeries;
+  }, [amiibos]);
+
+  const filteredAmiibos = useMemo(() => {
+    return amiibos.filter(amiibo => {
+      const matchesSearch = 
+        amiibo.name.toLowerCase().includes(search.toLowerCase()) ||
+        amiibo.series.toLowerCase().includes(search.toLowerCase()) ||
+        amiibo.character_name.toLowerCase().includes(search.toLowerCase());
+      
+      const matchesSeries = selectedSeries === 'all' || amiibo.series === selectedSeries;
+      const isInCollection = !!getUserAmiibo(amiibo.id);
+      
+      if (filter === 'collected') return matchesSearch && matchesSeries && isInCollection;
+      if (filter === 'missing') return matchesSearch && matchesSeries && !isInCollection;
+      return matchesSearch && matchesSeries;
+    });
+  }, [amiibos, search, selectedSeries, filter, userAmiibos]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredAmiibos.length / ITEMS_PER_PAGE);
+  const paginatedAmiibos = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredAmiibos.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredAmiibos, currentPage]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, selectedSeries, filter]);
 
   const collectedCount = userAmiibos.length;
   const boxedCount = userAmiibos.filter(ua => ua.is_boxed).length;
@@ -287,18 +319,34 @@ export default function Index() {
         />
 
         {/* Search & Filter */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8 animate-slide-up" style={{ animationDelay: '200ms' }}>
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              placeholder="Buscar amiibos..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-11 h-12 rounded-xl border-2 border-border focus:border-primary"
-            />
+        <div className="flex flex-col gap-4 mb-8 animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Input
+                placeholder="Buscar amiibos..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-11 h-12 rounded-xl border-2 border-border focus:border-primary"
+              />
+            </div>
+            
+            <Select value={selectedSeries} onValueChange={setSelectedSeries}>
+              <SelectTrigger className="w-full sm:w-[220px] h-12 rounded-xl border-2 border-border">
+                <SelectValue placeholder="Filtrar por série" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as séries</SelectItem>
+                {seriesList.map(series => (
+                  <SelectItem key={series} value={series}>
+                    {series}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant={filter === 'all' ? 'default' : 'glass'}
               onClick={() => setFilter('all')}
@@ -320,14 +368,20 @@ export default function Index() {
             </Button>
           </div>
         </div>
+        
+        {/* Results count */}
+        <div className="mb-4 text-sm text-muted-foreground">
+          Mostrando {paginatedAmiibos.length} de {filteredAmiibos.length} amiibos
+          {selectedSeries !== 'all' && ` em "${selectedSeries}"`}
+        </div>
 
         {/* Amiibo Grid */}
-        {filteredAmiibos.length > 0 ? (
+        {paginatedAmiibos.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {filteredAmiibos.map((amiibo, index) => {
+            {paginatedAmiibos.map((amiibo, index) => {
               const userAmiibo = getUserAmiibo(amiibo.id);
               return (
-                <div key={amiibo.id} style={{ animationDelay: `${index * 50}ms` }}>
+                <div key={amiibo.id} className="animate-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
                   <AmiiboCard
                     id={amiibo.id}
                     name={amiibo.name}
@@ -349,6 +403,56 @@ export default function Index() {
             <p className="text-muted-foreground text-lg">
               Nenhum amiibo encontrado.
             </p>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-8">
+            <Button
+              variant="glass"
+              size="icon"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum: number;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={currentPage === pageNum ? 'default' : 'glass'}
+                    size="icon"
+                    onClick={() => setCurrentPage(pageNum)}
+                    className="w-10 h-10"
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+            </div>
+            
+            <Button
+              variant="glass"
+              size="icon"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
           </div>
         )}
       </main>
