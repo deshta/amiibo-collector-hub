@@ -6,9 +6,7 @@ import { cn } from '@/lib/utils';
 interface AmiiboCardProps {
   id: string;
   name: string;
-  series: string;
-  characterName: string;
-  imageUrl: string | null;
+  imagePath: string | null;
   isInCollection?: boolean;
   isBoxed?: boolean;
   onAdd?: () => void;
@@ -16,11 +14,18 @@ interface AmiiboCardProps {
   onToggleBoxed?: () => void;
 }
 
+// Helper to get full image URL from storage path
+const getImageUrl = (imagePath: string | null): string | null => {
+  if (!imagePath) return null;
+  // If it's already a full URL, return it
+  if (imagePath.startsWith('http')) return imagePath;
+  // Otherwise construct storage URL
+  return `https://qlqxczezbpchjnkjwyrd.supabase.co/storage/v1/object/public/amiibo-images/${imagePath}`;
+};
+
 export function AmiiboCard({
   name,
-  series,
-  characterName,
-  imageUrl,
+  imagePath,
   isInCollection = false,
   isBoxed = false,
   onAdd,
@@ -28,6 +33,7 @@ export function AmiiboCard({
   onToggleBoxed,
 }: AmiiboCardProps) {
   const [imageError, setImageError] = useState(false);
+  const imageUrl = getImageUrl(imagePath);
 
   return (
     <div
@@ -64,17 +70,9 @@ export function AmiiboCard({
 
       {/* Info */}
       <div className="space-y-1 mb-3">
-        <h3 className="font-bold text-foreground text-lg leading-tight line-clamp-1">
+        <h3 className="font-bold text-foreground text-lg leading-tight line-clamp-2">
           {name}
         </h3>
-        <p className="text-sm text-muted-foreground line-clamp-1">
-          {series}
-        </p>
-        {characterName !== name && (
-          <p className="text-xs text-muted-foreground/70 line-clamp-1">
-            {characterName}
-          </p>
-        )}
       </div>
 
       {/* Actions */}
@@ -85,7 +83,10 @@ export function AmiiboCard({
               variant={isBoxed ? "success" : "glass"}
               size="sm"
               className="flex-1"
-              onClick={onToggleBoxed}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleBoxed?.();
+              }}
             >
               <Package className="w-4 h-4" />
               {isBoxed ? 'Na caixa' : 'Sem caixa'}
@@ -93,7 +94,10 @@ export function AmiiboCard({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onRemove}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove?.();
+              }}
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
             >
               <Trash2 className="w-4 h-4" />
@@ -104,7 +108,10 @@ export function AmiiboCard({
             variant="default"
             size="sm"
             className="w-full"
-            onClick={onAdd}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAdd?.();
+            }}
           >
             <Plus className="w-4 h-4" />
             Adicionar
