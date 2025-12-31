@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 export type Language = 'pt' | 'es' | 'en';
 
@@ -90,18 +92,30 @@ const translations = {
     'condition.used': 'Usado',
     'condition.damaged': 'Danificado',
     
-    // Card
+    // Card & Modal
     'card.boxed': 'Lacrado',
     'card.unboxed': 'Aberto',
-    'card.addToCollection': 'Adicionar',
-    'card.inCollection': 'Na Coleção',
+    'card.add': 'Adicionar',
+    'card.addToCollection': 'Adicionar à Coleção',
+    'card.inCollection': 'Na coleção',
+    'card.inWishlist': 'Na wishlist',
+    'card.markAsBoxed': 'Marcar como lacrado',
+    'card.markAsUnboxed': 'Clique para marcar como aberto',
+    'card.removeFromWishlist': 'Remover da wishlist',
+    'card.addToWishlist': 'Adicionar à wishlist',
+    'card.condition': 'Condição',
     
     // Stats
-    'stats.total': 'Total',
+    'stats.total': 'Total Amiibos',
     'stats.collected': 'Colecionados',
     'stats.boxed': 'Lacrados',
     'stats.wishlist': 'Wishlist',
+    'stats.progress': 'Progresso',
     'stats.collectionProgress': 'Progresso da Coleção por Série',
+    'stats.noSeries': 'Sem série',
+    
+    // Footer
+    'footer.madeWith': 'Feito com muito queijo',
   },
   es: {
     // Header
@@ -184,18 +198,30 @@ const translations = {
     'condition.used': 'Usado',
     'condition.damaged': 'Dañado',
     
-    // Card
+    // Card & Modal
     'card.boxed': 'Sellado',
     'card.unboxed': 'Abierto',
-    'card.addToCollection': 'Agregar',
-    'card.inCollection': 'En Colección',
+    'card.add': 'Agregar',
+    'card.addToCollection': 'Agregar a Colección',
+    'card.inCollection': 'En colección',
+    'card.inWishlist': 'En lista de deseos',
+    'card.markAsBoxed': 'Marcar como sellado',
+    'card.markAsUnboxed': 'Clic para marcar como abierto',
+    'card.removeFromWishlist': 'Quitar de lista de deseos',
+    'card.addToWishlist': 'Agregar a lista de deseos',
+    'card.condition': 'Condición',
     
     // Stats
-    'stats.total': 'Total',
+    'stats.total': 'Total Amiibos',
     'stats.collected': 'Coleccionados',
     'stats.boxed': 'Sellados',
     'stats.wishlist': 'Lista de deseos',
+    'stats.progress': 'Progreso',
     'stats.collectionProgress': 'Progreso de Colección por Serie',
+    'stats.noSeries': 'Sin serie',
+    
+    // Footer
+    'footer.madeWith': 'Hecho con mucho queso',
   },
   en: {
     // Header
@@ -278,18 +304,30 @@ const translations = {
     'condition.used': 'Used',
     'condition.damaged': 'Damaged',
     
-    // Card
+    // Card & Modal
     'card.boxed': 'Boxed',
     'card.unboxed': 'Unboxed',
-    'card.addToCollection': 'Add',
-    'card.inCollection': 'In Collection',
+    'card.add': 'Add',
+    'card.addToCollection': 'Add to Collection',
+    'card.inCollection': 'In collection',
+    'card.inWishlist': 'In wishlist',
+    'card.markAsBoxed': 'Mark as boxed',
+    'card.markAsUnboxed': 'Click to mark as unboxed',
+    'card.removeFromWishlist': 'Remove from wishlist',
+    'card.addToWishlist': 'Add to wishlist',
+    'card.condition': 'Condition',
     
     // Stats
-    'stats.total': 'Total',
+    'stats.total': 'Total Amiibos',
     'stats.collected': 'Collected',
     'stats.boxed': 'Boxed',
     'stats.wishlist': 'Wishlist',
+    'stats.progress': 'Progress',
     'stats.collectionProgress': 'Collection Progress by Series',
+    'stats.noSeries': 'No series',
+    
+    // Footer
+    'footer.madeWith': 'Made with lots of cheese',
   },
 };
 
@@ -300,13 +338,67 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem('app-language');
     return (saved as Language) || 'pt';
   });
+  const [initialized, setInitialized] = useState(false);
 
+  // Load language from user profile when authenticated
+  useEffect(() => {
+    const loadUserLanguage = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('language')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile?.language) {
+          setLanguageState(profile.language as Language);
+          localStorage.setItem('app-language', profile.language);
+        }
+      }
+      setInitialized(true);
+    };
+
+    loadUserLanguage();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        setTimeout(async () => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('language')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (profile?.language) {
+            setLanguageState(profile.language as Language);
+            localStorage.setItem('app-language', profile.language);
+          }
+        }, 0);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Save to localStorage
   useEffect(() => {
     localStorage.setItem('app-language', language);
   }, [language]);
 
-  const setLanguage = (lang: Language) => {
+  const setLanguage = async (lang: Language) => {
     setLanguageState(lang);
+    localStorage.setItem('app-language', lang);
+
+    // Save to user profile if authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      await supabase
+        .from('profiles')
+        .update({ language: lang })
+        .eq('id', session.user.id);
+    }
   };
 
   const t = (key: string): string => {

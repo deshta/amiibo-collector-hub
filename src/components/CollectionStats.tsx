@@ -43,7 +43,7 @@ export function CollectionStats({ total, collected, boxed, wishlistCount }: Coll
     },
     {
       icon: Package,
-      label: "Progresso",
+      label: t('stats.progress'),
       value: `${percentage}%`,
       color: "text-accent",
       bg: "bg-accent/10",

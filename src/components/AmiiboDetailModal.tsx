@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
 
@@ -51,18 +52,6 @@ const getImageUrl = (imagePath: string | null): string | null => {
   return `https://qlqxczezbpchjnkjwyrd.supabase.co/storage/v1/object/public/amiibo-images/${imagePath}`;
 };
 
-// Format date for display
-const formatDate = (date: string | null): string => {
-  if (!date) return '-';
-  return new Date(date).toLocaleDateString('pt-BR');
-};
-
-const conditionConfig = {
-  new: { icon: Sparkles, label: 'Novo', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-  used: { icon: ThumbsUp, label: 'Usado', color: 'text-amber-500', bg: 'bg-amber-500/10' },
-  damaged: { icon: AlertTriangle, label: 'Danificado', color: 'text-red-500', bg: 'bg-red-500/10' },
-};
-
 export function AmiiboDetailModal({
   amiibo,
   isOpen,
@@ -77,9 +66,24 @@ export function AmiiboDetailModal({
   onToggleWishlist,
   onConditionChange,
 }: AmiiboDetailModalProps) {
+  const { t, language } = useLanguage();
+  
   if (!amiibo) return null;
 
   const imageUrl = getImageUrl(amiibo.image_path);
+
+  // Format date for display based on language
+  const formatDate = (date: string | null): string => {
+    if (!date) return '-';
+    const localeMap = { pt: 'pt-BR', es: 'es-ES', en: 'en-US' };
+    return new Date(date).toLocaleDateString(localeMap[language]);
+  };
+
+  const conditionConfig = {
+    new: { icon: Sparkles, label: t('condition.new'), color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    used: { icon: ThumbsUp, label: t('condition.used'), color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    damaged: { icon: AlertTriangle, label: t('condition.damaged'), color: 'text-red-500', bg: 'bg-red-500/10' },
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -109,13 +113,13 @@ export function AmiiboDetailModal({
             {isInCollection && (
               <Badge variant="default" className="text-sm bg-success text-success-foreground">
                 <Check className="w-3 h-3 mr-1" />
-                Na coleção
+                {t('card.inCollection')}
               </Badge>
             )}
             {isInWishlist && !isInCollection && (
               <Badge variant="default" className="text-sm bg-pink-500 text-white">
                 <Heart className="w-3 h-3 mr-1 fill-current" />
-                Na wishlist
+                {t('card.inWishlist')}
               </Badge>
             )}
           </div>
@@ -186,12 +190,12 @@ export function AmiiboDetailModal({
                     {isBoxed ? (
                       <>
                         <Package className="w-3 h-3 mr-1" />
-                        Lacrado
+                        {t('card.boxed')}
                       </>
                     ) : (
                       <>
                         <PackageOpen className="w-3 h-3 mr-1" />
-                        Aberto
+                        {t('card.unboxed')}
                       </>
                     )}
                   </Badge>
@@ -216,7 +220,7 @@ export function AmiiboDetailModal({
             {/* Condition Selector */}
             {isInCollection && (
               <div className="flex items-center justify-center gap-3">
-                <span className="text-sm text-muted-foreground">Condição:</span>
+                <span className="text-sm text-muted-foreground">{t('card.condition')}:</span>
                 <Select value={condition} onValueChange={(value) => onConditionChange?.(value as AmiiboCondition)}>
                   <SelectTrigger className="w-[140px]">
                     <SelectValue />
@@ -225,19 +229,19 @@ export function AmiiboDetailModal({
                     <SelectItem value="new">
                       <div className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-emerald-500" />
-                        Novo
+                        {t('condition.new')}
                       </div>
                     </SelectItem>
                     <SelectItem value="used">
                       <div className="flex items-center gap-2">
                         <ThumbsUp className="w-4 h-4 text-amber-500" />
-                        Usado
+                        {t('condition.used')}
                       </div>
                     </SelectItem>
                     <SelectItem value="damaged">
                       <div className="flex items-center gap-2">
                         <AlertTriangle className="w-4 h-4 text-red-500" />
-                        Danificado
+                        {t('condition.damaged')}
                       </div>
                     </SelectItem>
                   </SelectContent>
@@ -253,17 +257,17 @@ export function AmiiboDetailModal({
                     variant={isBoxed ? "success" : "secondary"}
                     className="flex-1"
                     onClick={onToggleBoxed}
-                    title={isBoxed ? "Clique para marcar como aberto" : "Clique para marcar como lacrado"}
+                    title={isBoxed ? t('card.markAsUnboxed') : t('card.markAsBoxed')}
                   >
                     {isBoxed ? (
                       <>
                         <Package className="w-4 h-4 mr-2" />
-                        Lacrado
+                        {t('card.boxed')}
                       </>
                     ) : (
                       <>
                         <PackageOpen className="w-4 h-4 mr-2" />
-                        Marcar como lacrado
+                        {t('card.markAsBoxed')}
                       </>
                     )}
                   </Button>
@@ -282,7 +286,7 @@ export function AmiiboDetailModal({
                     onClick={onAdd}
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Adicionar à Coleção
+                    {t('card.addToCollection')}
                   </Button>
                   <Button
                     variant={isInWishlist ? "default" : "outline"}
