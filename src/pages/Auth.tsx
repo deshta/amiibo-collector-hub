@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { Mail, Lock, User, Sparkles, Star, Heart } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { Mail, Lock, User, Sparkles, Star, Heart } from "lucide-react";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ export default function Auth() {
 
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate("/");
     }
   }, [user, navigate]);
 
@@ -32,42 +32,38 @@ export default function Auth() {
         const { error } = await signIn(email, password);
         if (error) {
           toast({
-            title: 'Erro ao entrar',
-            description: error.message === 'Invalid login credentials' 
-              ? 'Email ou senha incorretos' 
-              : error.message,
-            variant: 'destructive',
+            title: "Erro ao entrar",
+            description: error.message === "Invalid login credentials" ? "Email ou senha incorretos" : error.message,
+            variant: "destructive",
           });
         } else {
           toast({
-            title: 'Bem-vindo de volta!',
-            description: 'Login realizado com sucesso.',
+            title: "Bem-vindo de volta!",
+            description: "Login realizado com sucesso.",
           });
-          navigate('/');
+          navigate("/");
         }
       } else {
         const { error } = await signUp(email, password, username);
         if (error) {
           toast({
-            title: 'Erro ao criar conta',
-            description: error.message.includes('already registered')
-              ? 'Este email já está cadastrado'
-              : error.message,
-            variant: 'destructive',
+            title: "Erro ao criar conta",
+            description: error.message.includes("already registered") ? "Este email já está cadastrado" : error.message,
+            variant: "destructive",
           });
         } else {
           toast({
-            title: 'Conta criada!',
-            description: 'Sua conta foi criada com sucesso.',
+            title: "Conta criada!",
+            description: "Sua conta foi criada com sucesso.",
           });
-          navigate('/');
+          navigate("/");
         }
       }
     } catch (err) {
       toast({
-        title: 'Erro',
-        description: 'Algo deu errado. Tente novamente.',
-        variant: 'destructive',
+        title: "Erro",
+        description: "Algo deu errado. Tente novamente.",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -84,10 +80,13 @@ export default function Auth() {
         <div className="absolute top-40 right-20 text-secondary/30 animate-bounce-subtle">
           <Heart className="w-8 h-8" />
         </div>
-        <div className="absolute bottom-32 left-1/4 text-accent/20 animate-float" style={{ animationDelay: '1s' }}>
+        <div className="absolute bottom-32 left-1/4 text-accent/20 animate-float" style={{ animationDelay: "1s" }}>
           <Star className="w-6 h-6" />
         </div>
-        <div className="absolute bottom-20 right-1/3 text-primary/15 animate-bounce-subtle" style={{ animationDelay: '0.5s' }}>
+        <div
+          className="absolute bottom-20 right-1/3 text-primary/15 animate-bounce-subtle"
+          style={{ animationDelay: "0.5s" }}
+        >
           <Heart className="w-10 h-10" />
         </div>
       </div>
@@ -98,11 +97,9 @@ export default function Auth() {
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-lg mb-4">
             <span className="text-4xl">✨</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-foreground mb-2">
-            Minha Coleção
-          </h1>
+          <h1 className="text-3xl font-extrabold text-foreground mb-2">Minha Coleção</h1>
           <p className="text-muted-foreground">
-            {isLogin ? 'Entre para gerenciar sua coleção' : 'Crie sua conta e comece a colecionar'}
+            {isLogin ? "Entre para gerenciar sua coleção" : "Crie sua conta e comece a colecionar"}
           </p>
         </div>
 
@@ -165,21 +162,16 @@ export default function Auth() {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  {isLogin ? 'Entrando...' : 'Criando conta...'}
+                  {isLogin ? "Entrando..." : "Criando conta..."}
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
-                  {isLogin ? 'Entrar' : 'Criar conta'}
+                  {isLogin ? "Entrar" : "Criar conta"}
                 </span>
               )}
             </Button>
@@ -191,14 +183,14 @@ export default function Auth() {
               onClick={() => setIsLogin(!isLogin)}
               className="text-primary hover:underline font-semibold transition-colors"
             >
-              {isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entre'}
+              {isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Entre"}
             </button>
           </div>
         </div>
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p>Organize e acompanhe sua coleção de colecionáveis</p>
+          <p>Organize e acompanhe sua coleção de Amiibos</p>
         </div>
       </div>
     </div>
