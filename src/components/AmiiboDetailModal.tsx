@@ -1,4 +1,5 @@
-import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -62,6 +63,7 @@ export function AmiiboDetailModal({
   onConditionChange,
 }: AmiiboDetailModalProps) {
   const { t, language } = useLanguage();
+  const [imageError, setImageError] = useState(false);
   
   if (!amiibo) return null;
 
@@ -90,15 +92,16 @@ export function AmiiboDetailModal({
         <div className="flex flex-col items-center gap-6">
           {/* Image - Real size */}
           <div className="rounded-2xl bg-gradient-to-b from-muted/50 to-muted p-4">
-            {imageUrl ? (
+            {imageUrl && !imageError ? (
               <img
                 src={imageUrl}
                 alt={amiibo.name}
                 className="max-w-full h-auto"
+                onError={() => setImageError(true)}
               />
             ) : (
               <div className="flex items-center justify-center w-48 h-48">
-                <Package className="w-20 h-20 text-muted-foreground/50" />
+                <ImageOff className="w-20 h-20 text-muted-foreground/50" />
               </div>
             )}
           </div>
