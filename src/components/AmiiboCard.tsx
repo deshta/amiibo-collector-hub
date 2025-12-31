@@ -86,18 +86,18 @@ export function AmiiboCard({
       </div>
 
       {/* Info */}
-      <div className="space-y-1 mb-3">
-        <h3 className="font-bold text-foreground text-lg leading-tight line-clamp-2">
+      <div className="space-y-2 mb-3 min-h-[72px]">
+        <h3 className="font-bold text-foreground text-base leading-snug min-h-[40px] line-clamp-2">
           {name}
         </h3>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {type && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium whitespace-nowrap">
               {type}
             </span>
           )}
           {series && (
-            <p className="text-sm text-muted-foreground line-clamp-1 truncate flex-1">
+            <p className="text-xs text-muted-foreground line-clamp-1 truncate flex-1">
               {series}
             </p>
           )}
