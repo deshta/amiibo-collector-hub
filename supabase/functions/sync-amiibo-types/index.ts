@@ -5,66 +5,67 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Type mapping based on AmiiboAPI documentation
+const TYPE_MAP: { [key: string]: string } = {
+  "00": "Figure",
+  "01": "Card",
+  "02": "Yarn",
+  "03": "Band",
+  "04": "Block"
+};
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Starting amiibo type sync from GitHub...');
+    console.log('Starting amiibo type sync...');
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Fetch amiibo data from GitHub
-    const amiiboResponse = await fetch('https://raw.githubusercontent.com/N3evin/AmiiboAPI/master/database/amiibo.json');
-    const amiiboData = await amiiboResponse.json();
-    
-    // Fetch type mapping from GitHub
-    const typeResponse = await fetch('https://raw.githubusercontent.com/N3evin/AmiiboAPI/master/database/amiibo_type.json');
-    const typeData = await typeResponse.json();
-    
-    // Create type map: "0x00" -> "Figure"
-    const typeNameMap = new Map<string, string>();
-    for (const [key, value] of Object.entries(typeData.amiibo_type)) {
-      typeNameMap.set(key, (value as {key: string, name: string}).name);
-    }
-    console.log(`Type mappings: ${[...typeNameMap.entries()].map(([k,v]) => `${k}=${v}`).join(', ')}`);
-
-    // Create map of hex_id to type by extracting type byte from hex
-    const amiiboTypeMap = new Map<string, string>();
-    for (const hexId of Object.keys(amiiboData.amiibos)) {
-      const cleanHex = hexId.toLowerCase().replace('0x', '');
-      // Type is at byte position 12-13 (characters 12-14 in the 16-char hex)
-      const typeByte = `0x${cleanHex.substring(12, 14)}`;
-      const typeName = typeNameMap.get(typeByte);
-      if (typeName) {
-        amiiboTypeMap.set(hexId.toLowerCase(), typeName);
-      }
-    }
-    console.log(`Created ${amiiboTypeMap.size} type mappings`);
-
-    // Fetch and update database
+    // Fetch all amiibos from database
     const { data: dbAmiibos, error: fetchError } = await supabase
       .from('amiibos')
       .select('id, name, amiibo_hex_id, type');
 
     if (fetchError) throw new Error(fetchError.message);
+    console.log(`Found ${dbAmiibos?.length || 0} amiibos in database`);
 
     let updatedCount = 0;
+    const updates: string[] = [];
+
     for (const dbAmiibo of dbAmiibos || []) {
-      const hexId = dbAmiibo.amiibo_hex_id?.toLowerCase() || '';
-      const newType = amiiboTypeMap.get(hexId);
+      const hexId = dbAmiibo.amiibo_hex_id?.toLowerCase().replace('0x', '') || '';
       
-      if (newType && newType !== dbAmiibo.type) {
-        await supabase.from('amiibos').update({ type: newType }).eq('id', dbAmiibo.id);
-        updatedCount++;
+      if (hexId.length >= 16) {
+        // Based on AmiiboAPI structure: hex = head (8 chars) + tail (8 chars)
+        // Type is encoded in characters 6-7 of the HEAD (byte 4)
+        // Example: 0x00000000 00000002 -> type at position 6-7 of head = "00" = Figure
+        const typeByte = hexId.substring(6, 8);
+        const newType = TYPE_MAP[typeByte];
+        
+        if (newType && newType !== dbAmiibo.type) {
+          await supabase.from('amiibos').update({ type: newType }).eq('id', dbAmiibo.id);
+          updatedCount++;
+          if (updates.length < 10) {
+            updates.push(`${dbAmiibo.name}: ${dbAmiibo.type} -> ${newType} (byte: ${typeByte})`);
+          }
+        }
       }
     }
 
     console.log(`Updated ${updatedCount} amiibos`);
-    return new Response(JSON.stringify({ success: true, updated: updatedCount }), {
+    updates.forEach(u => console.log(u));
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      updated: updatedCount,
+      total: dbAmiibos?.length || 0,
+      samples: updates 
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
