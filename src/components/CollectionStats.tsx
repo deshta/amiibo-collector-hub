@@ -1,4 +1,5 @@
 import { Package, Trophy, Star, Box, Heart } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface CollectionStatsProps {
   total: number;
@@ -8,33 +9,34 @@ interface CollectionStatsProps {
 }
 
 export function CollectionStats({ total, collected, boxed, wishlistCount }: CollectionStatsProps) {
+  const { t } = useLanguage();
   const percentage = total > 0 ? Math.round((collected / total) * 100) : 0;
 
   const stats = [
     {
       icon: Trophy,
-      label: "Colecionados",
+      label: t('stats.collected'),
       value: collected,
       color: "text-primary",
       bg: "bg-primary/10",
     },
     {
       icon: Star,
-      label: "Total Amiibos",
+      label: t('stats.total'),
       value: total,
       color: "text-secondary-foreground",
       bg: "bg-secondary/30",
     },
     {
       icon: Box,
-      label: "Lacrado",
+      label: t('stats.boxed'),
       value: boxed,
       color: "text-success",
       bg: "bg-success/10",
     },
     {
       icon: Heart,
-      label: "Wishlist",
+      label: t('stats.wishlist'),
       value: wishlistCount,
       color: "text-pink-500",
       bg: "bg-pink-500/10",

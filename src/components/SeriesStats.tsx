@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Gamepad2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface Amiibo {
   id: string;
@@ -17,6 +18,8 @@ interface SeriesStatsProps {
 }
 
 export function SeriesStats({ amiibos, userAmiibos }: SeriesStatsProps) {
+  const { t } = useLanguage();
+  
   const seriesStats = useMemo(() => {
     const collectedIds = new Set(userAmiibos.map(ua => ua.amiibo_id));
     
@@ -50,7 +53,7 @@ export function SeriesStats({ amiibos, userAmiibos }: SeriesStatsProps) {
     <div className="glass-card rounded-2xl p-6 mb-8 animate-slide-up" style={{ animationDelay: '150ms' }}>
       <div className="flex items-center gap-2 mb-4">
         <Gamepad2 className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-bold text-foreground">Progresso por Série</h2>
+        <h2 className="text-lg font-bold text-foreground">{t('stats.collectionProgress')}</h2>
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto pr-2">
