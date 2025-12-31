@@ -430,7 +430,7 @@ export default function Index() {
       />
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-lg border-t border-border/50 z-40">
+      <footer className="py-6 mt-8 border-t border-border/50">
         <div className="container flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <span>Feito com muito queijo</span>
           <img 
@@ -440,9 +440,6 @@ export default function Index() {
           />
         </div>
       </footer>
-
-      {/* Spacer for fixed footer */}
-      <div className="h-14" />
     </div>
   );
 }
