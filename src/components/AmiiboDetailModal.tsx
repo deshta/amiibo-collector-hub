@@ -58,22 +58,22 @@ export function AmiiboDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">{amiibo.name}</DialogTitle>
         </DialogHeader>
         
         <div className="flex flex-col items-center gap-6">
-          {/* Image */}
-          <div className="relative w-48 h-48 rounded-2xl bg-gradient-to-b from-muted/50 to-muted overflow-hidden">
+          {/* Image - Real size */}
+          <div className="relative rounded-2xl bg-gradient-to-b from-muted/50 to-muted p-4">
             {imageUrl ? (
               <img
                 src={imageUrl}
                 alt={amiibo.name}
-                className="w-full h-full object-contain p-4"
+                className="max-w-full h-auto"
               />
             ) : (
-              <div className="flex items-center justify-center h-full">
+              <div className="flex items-center justify-center w-48 h-48">
                 <Package className="w-20 h-20 text-muted-foreground/50" />
               </div>
             )}
