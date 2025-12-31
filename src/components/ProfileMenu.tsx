@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Calendar, Globe, Trash2, Loader2 } from 'lucide-react';
+import { User, Calendar, Globe, Trash2, Loader2, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
@@ -76,6 +76,11 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  // Password change state
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -244,6 +249,98 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
                 t('profile.save')
               )}
             </Button>
+
+            {/* Change Password Section */}
+            <div className="pt-4 border-t border-border">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 font-medium">
+                  <Lock className="w-4 h-4 text-primary" />
+                  {t('profile.changePassword')}
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">{t('profile.newPassword')}</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">{t('profile.confirmPassword')}</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                </div>
+                
+                <Button
+                  variant="secondary"
+                  className="w-full"
+                  onClick={async () => {
+                    if (newPassword !== confirmPassword) {
+                      toast({
+                        title: t('profile.error'),
+                        description: t('profile.passwordMismatch'),
+                        variant: 'destructive',
+                      });
+                      return;
+                    }
+                    if (newPassword.length < 6) {
+                      toast({
+                        title: t('profile.error'),
+                        description: 'Password must be at least 6 characters',
+                        variant: 'destructive',
+                      });
+                      return;
+                    }
+                    
+                    setChangingPassword(true);
+                    try {
+                      const { error } = await supabase.auth.updateUser({
+                        password: newPassword,
+                      });
+                      
+                      if (error) throw error;
+                      
+                      toast({
+                        title: t('profile.passwordChanged'),
+                        description: t('profile.passwordChangedDesc'),
+                      });
+                      setNewPassword('');
+                      setConfirmPassword('');
+                    } catch (error) {
+                      console.error('Error changing password:', error);
+                      toast({
+                        title: t('profile.passwordError'),
+                        variant: 'destructive',
+                      });
+                    } finally {
+                      setChangingPassword(false);
+                    }
+                  }}
+                  disabled={changingPassword || !newPassword || !confirmPassword}
+                >
+                  {changingPassword ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {t('profile.saving')}
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4 mr-2" />
+                      {t('profile.changePassword')}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
 
             {/* Delete Account Section */}
             <div className="pt-4 border-t border-destructive/20">

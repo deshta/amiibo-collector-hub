@@ -139,6 +139,24 @@ const translations = {
     'profile.deleting': 'Excluindo...',
     'profile.deleted': 'Conta excluída',
     'profile.deletedDesc': 'Sua conta foi excluída com sucesso.',
+    'profile.changePassword': 'Alterar Senha',
+    'profile.currentPassword': 'Senha Atual',
+    'profile.newPassword': 'Nova Senha',
+    'profile.confirmPassword': 'Confirmar Nova Senha',
+    'profile.passwordMismatch': 'As senhas não coincidem',
+    'profile.passwordChanged': 'Senha alterada!',
+    'profile.passwordChangedDesc': 'Sua senha foi alterada com sucesso.',
+    'profile.passwordError': 'Erro ao alterar senha',
+    
+    // Auth - Forgot Password
+    'auth.forgotPassword': 'Esqueceu a senha?',
+    'auth.resetPassword': 'Redefinir Senha',
+    'auth.resetPasswordDesc': 'Digite seu email para receber um link de redefinição',
+    'auth.sendResetLink': 'Enviar Link',
+    'auth.sending': 'Enviando...',
+    'auth.resetLinkSent': 'Link enviado!',
+    'auth.resetLinkSentDesc': 'Verifique seu email para redefinir sua senha.',
+    'auth.backToLogin': 'Voltar ao login',
   },
   es: {
     // Header
@@ -268,6 +286,24 @@ const translations = {
     'profile.deleting': 'Eliminando...',
     'profile.deleted': 'Cuenta eliminada',
     'profile.deletedDesc': 'Tu cuenta fue eliminada con éxito.',
+    'profile.changePassword': 'Cambiar Contraseña',
+    'profile.currentPassword': 'Contraseña Actual',
+    'profile.newPassword': 'Nueva Contraseña',
+    'profile.confirmPassword': 'Confirmar Nueva Contraseña',
+    'profile.passwordMismatch': 'Las contraseñas no coinciden',
+    'profile.passwordChanged': '¡Contraseña cambiada!',
+    'profile.passwordChangedDesc': 'Tu contraseña fue cambiada con éxito.',
+    'profile.passwordError': 'Error al cambiar contraseña',
+    
+    // Auth - Forgot Password
+    'auth.forgotPassword': '¿Olvidaste tu contraseña?',
+    'auth.resetPassword': 'Restablecer Contraseña',
+    'auth.resetPasswordDesc': 'Ingresa tu email para recibir un enlace de restablecimiento',
+    'auth.sendResetLink': 'Enviar Enlace',
+    'auth.sending': 'Enviando...',
+    'auth.resetLinkSent': '¡Enlace enviado!',
+    'auth.resetLinkSentDesc': 'Revisa tu email para restablecer tu contraseña.',
+    'auth.backToLogin': 'Volver al inicio de sesión',
   },
   en: {
     // Header
@@ -397,6 +433,24 @@ const translations = {
     'profile.deleting': 'Deleting...',
     'profile.deleted': 'Account deleted',
     'profile.deletedDesc': 'Your account was deleted successfully.',
+    'profile.changePassword': 'Change Password',
+    'profile.currentPassword': 'Current Password',
+    'profile.newPassword': 'New Password',
+    'profile.confirmPassword': 'Confirm New Password',
+    'profile.passwordMismatch': 'Passwords do not match',
+    'profile.passwordChanged': 'Password changed!',
+    'profile.passwordChangedDesc': 'Your password was changed successfully.',
+    'profile.passwordError': 'Error changing password',
+    
+    // Auth - Forgot Password
+    'auth.forgotPassword': 'Forgot your password?',
+    'auth.resetPassword': 'Reset Password',
+    'auth.resetPasswordDesc': 'Enter your email to receive a reset link',
+    'auth.sendResetLink': 'Send Link',
+    'auth.sending': 'Sending...',
+    'auth.resetLinkSent': 'Link sent!',
+    'auth.resetLinkSentDesc': 'Check your email to reset your password.',
+    'auth.backToLogin': 'Back to login',
   },
 };
 
