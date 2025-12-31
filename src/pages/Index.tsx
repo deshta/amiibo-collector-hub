@@ -47,7 +47,27 @@ interface WishlistItem {
   amiibo_id: string;
 }
 
-const ITEMS_PER_PAGE = 24;
+const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50, 100] as const;
+type ItemsPerPage = typeof ITEMS_PER_PAGE_OPTIONS[number];
+
+const getItemsPerPageFromCookie = (): ItemsPerPage => {
+  const cookie = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('itemsPerPage='));
+  if (cookie) {
+    const value = parseInt(cookie.split('=')[1], 10) as ItemsPerPage;
+    if (ITEMS_PER_PAGE_OPTIONS.includes(value)) {
+      return value;
+    }
+  }
+  return 20;
+};
+
+const setItemsPerPageCookie = (value: ItemsPerPage) => {
+  const expires = new Date();
+  expires.setFullYear(expires.getFullYear() + 1);
+  document.cookie = `itemsPerPage=${value}; expires=${expires.toUTCString()}; path=/`;
+};
 
 export default function Index() {
   const { user, loading: authLoading } = useAuth();
@@ -66,6 +86,7 @@ export default function Index() {
   const [sortBy, setSortBy] = useState<'name' | 'release_na' | 'release_jp'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => getItemsPerPageFromCookie());
   const [selectedAmiibo, setSelectedAmiibo] = useState<Amiibo | null>(null);
 
   useEffect(() => {
@@ -335,12 +356,19 @@ export default function Index() {
     });
   }, [amiibos, search, selectedSeries, selectedType, filter, userAmiibos, wishlist, sortBy, sortOrder]);
 
+  const handleItemsPerPageChange = (value: string) => {
+    const newValue = parseInt(value, 10) as ItemsPerPage;
+    setItemsPerPage(newValue);
+    setItemsPerPageCookie(newValue);
+    setCurrentPage(1);
+  };
+
   // Pagination
-  const totalPages = Math.ceil(filteredAmiibos.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredAmiibos.length / itemsPerPage);
   const paginatedAmiibos = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredAmiibos.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredAmiibos, currentPage]);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAmiibos.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAmiibos, currentPage, itemsPerPage]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -540,8 +568,27 @@ export default function Index() {
         )}
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-8">
+        {totalPages >= 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+            {/* Items per page selector */}
+            <div className="flex items-center gap-2">
+              <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                <SelectTrigger className="w-[100px] h-10 rounded-xl border-2 border-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ITEMS_PER_PAGE_OPTIONS.map(option => (
+                    <SelectItem key={option} value={option.toString()}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <span className="text-sm text-muted-foreground">{t('index.itemsPerPage')}</span>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center gap-2">
             <Button
               variant="glass"
               size="icon"
@@ -586,6 +633,8 @@ export default function Index() {
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
+              </div>
+            )}
           </div>
         )}
       </main>

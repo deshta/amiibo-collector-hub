@@ -69,6 +69,7 @@ const translations = {
     'index.previous': 'Anterior',
     'index.next': 'Próxima',
     'index.page': 'Página',
+    'index.itemsPerPage': 'por página',
     
     // Toasts
     'toast.added': 'Adicionado!',
@@ -175,6 +176,7 @@ const translations = {
     'index.previous': 'Anterior',
     'index.next': 'Siguiente',
     'index.page': 'Página',
+    'index.itemsPerPage': 'por página',
     
     // Toasts
     'toast.added': '¡Agregado!',
@@ -281,6 +283,7 @@ const translations = {
     'index.previous': 'Previous',
     'index.next': 'Next',
     'index.page': 'Page',
+    'index.itemsPerPage': 'per page',
     
     // Toasts
     'toast.added': 'Added!',
