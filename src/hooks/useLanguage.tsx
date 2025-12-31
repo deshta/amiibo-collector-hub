@@ -118,6 +118,27 @@ const translations = {
     
     // Footer
     'footer.madeWith': 'Feito com muito queijo',
+    
+    // Profile
+    'profile.title': 'Meu Perfil',
+    'profile.name': 'Nome',
+    'profile.namePlaceholder': 'Seu nome',
+    'profile.birthdate': 'Data de Nascimento',
+    'profile.country': 'País',
+    'profile.countryPlaceholder': 'Selecione seu país',
+    'profile.save': 'Salvar',
+    'profile.saving': 'Salvando...',
+    'profile.saved': 'Perfil atualizado!',
+    'profile.savedDesc': 'Suas informações foram salvas com sucesso.',
+    'profile.error': 'Erro ao salvar',
+    'profile.deleteAccount': 'Excluir Conta',
+    'profile.deleteWarning': 'Esta ação é irreversível. Todos os seus dados serão permanentemente excluídos.',
+    'profile.deleteConfirm': 'Tem certeza que deseja excluir sua conta?',
+    'profile.deleteButton': 'Sim, excluir minha conta',
+    'profile.cancel': 'Cancelar',
+    'profile.deleting': 'Excluindo...',
+    'profile.deleted': 'Conta excluída',
+    'profile.deletedDesc': 'Sua conta foi excluída com sucesso.',
   },
   es: {
     // Header
@@ -226,6 +247,27 @@ const translations = {
     
     // Footer
     'footer.madeWith': 'Hecho con mucho queso',
+    
+    // Profile
+    'profile.title': 'Mi Perfil',
+    'profile.name': 'Nombre',
+    'profile.namePlaceholder': 'Tu nombre',
+    'profile.birthdate': 'Fecha de Nacimiento',
+    'profile.country': 'País',
+    'profile.countryPlaceholder': 'Selecciona tu país',
+    'profile.save': 'Guardar',
+    'profile.saving': 'Guardando...',
+    'profile.saved': '¡Perfil actualizado!',
+    'profile.savedDesc': 'Tu información fue guardada con éxito.',
+    'profile.error': 'Error al guardar',
+    'profile.deleteAccount': 'Eliminar Cuenta',
+    'profile.deleteWarning': 'Esta acción es irreversible. Todos tus datos serán eliminados permanentemente.',
+    'profile.deleteConfirm': '¿Estás seguro de que deseas eliminar tu cuenta?',
+    'profile.deleteButton': 'Sí, eliminar mi cuenta',
+    'profile.cancel': 'Cancelar',
+    'profile.deleting': 'Eliminando...',
+    'profile.deleted': 'Cuenta eliminada',
+    'profile.deletedDesc': 'Tu cuenta fue eliminada con éxito.',
   },
   en: {
     // Header
@@ -334,6 +376,27 @@ const translations = {
     
     // Footer
     'footer.madeWith': 'Made with lots of cheese',
+    
+    // Profile
+    'profile.title': 'My Profile',
+    'profile.name': 'Name',
+    'profile.namePlaceholder': 'Your name',
+    'profile.birthdate': 'Birthdate',
+    'profile.country': 'Country',
+    'profile.countryPlaceholder': 'Select your country',
+    'profile.save': 'Save',
+    'profile.saving': 'Saving...',
+    'profile.saved': 'Profile updated!',
+    'profile.savedDesc': 'Your information was saved successfully.',
+    'profile.error': 'Error saving',
+    'profile.deleteAccount': 'Delete Account',
+    'profile.deleteWarning': 'This action is irreversible. All your data will be permanently deleted.',
+    'profile.deleteConfirm': 'Are you sure you want to delete your account?',
+    'profile.deleteButton': 'Yes, delete my account',
+    'profile.cancel': 'Cancel',
+    'profile.deleting': 'Deleting...',
+    'profile.deleted': 'Account deleted',
+    'profile.deletedDesc': 'Your account was deleted successfully.',
   },
 };
 
