@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
@@ -45,12 +46,6 @@ interface AmiiboDetailModalProps {
   onConditionChange?: (condition: AmiiboCondition) => void;
 }
 
-// Helper to get full image URL from storage path
-const getImageUrl = (imagePath: string | null): string | null => {
-  if (!imagePath) return null;
-  if (imagePath.startsWith('http')) return imagePath;
-  return `https://qlqxczezbpchjnkjwyrd.supabase.co/storage/v1/object/public/amiibo-images/${imagePath}`;
-};
 
 export function AmiiboDetailModal({
   amiibo,
@@ -70,7 +65,7 @@ export function AmiiboDetailModal({
   
   if (!amiibo) return null;
 
-  const imageUrl = getImageUrl(amiibo.image_path);
+  const imageUrl = getAmiiboImageUrl(amiibo.image_path);
 
   // Format date for display based on language
   const formatDate = (date: string | null): string => {
