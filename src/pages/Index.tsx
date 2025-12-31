@@ -8,7 +8,7 @@ import { CollectionStats } from '@/components/CollectionStats';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Filter, Loader2 } from 'lucide-react';
+import { Search, Filter, Loader2, RefreshCw } from 'lucide-react';
 
 interface Amiibo {
   id: string;
@@ -34,6 +34,7 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'collected' | 'missing'>('all');
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -69,6 +70,76 @@ export default function Index() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const syncAmiibos = async () => {
+    setSyncing(true);
+    try {
+      const response = await fetch('https://www.amiiboapi.com/api/amiibo/');
+      if (!response.ok) throw new Error('Falha ao buscar dados');
+      
+      const data = await response.json();
+      const amiibosFromApi = data.amiibo as Array<{
+        name: string;
+        amiiboSeries: string;
+        character: string;
+        image: string;
+        release: { jp: string | null; na: string | null; eu: string | null; au: string | null };
+      }>;
+
+      // Get unique amiibos by name + series
+      const uniqueMap = new Map<string, typeof amiibosFromApi[0]>();
+      amiibosFromApi.forEach(a => {
+        const key = `${a.name}-${a.amiiboSeries}`;
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, a);
+        }
+      });
+
+      const uniqueAmiibos = Array.from(uniqueMap.values());
+      
+      // Transform data
+      const newAmiibos = uniqueAmiibos.map(a => {
+        const dates = [a.release.jp, a.release.na, a.release.eu, a.release.au].filter(Boolean).sort();
+        return {
+          name: a.name,
+          series: a.amiiboSeries,
+          character_name: a.character,
+          image_url: a.image,
+          release_date: dates.length > 0 ? dates[0] : null,
+        };
+      });
+
+      // Insert new amiibos (upsert by checking existing)
+      const existingNames = new Set(amiibos.map(a => `${a.name}-${a.series}`));
+      const toInsert = newAmiibos.filter(a => !existingNames.has(`${a.name}-${a.series}`));
+
+      if (toInsert.length > 0) {
+        // Insert in batches
+        const batchSize = 50;
+        for (let i = 0; i < toInsert.length; i += batchSize) {
+          const batch = toInsert.slice(i, i + batchSize);
+          const { error } = await supabase.from('amiibos').insert(batch);
+          if (error) throw error;
+        }
+      }
+
+      toast({
+        title: 'Catálogo sincronizado!',
+        description: `${toInsert.length} novos amiibos adicionados. Total: ${uniqueAmiibos.length}`,
+      });
+      
+      await fetchData();
+    } catch (error) {
+      console.error('Error syncing:', error);
+      toast({
+        title: 'Erro na sincronização',
+        description: 'Não foi possível sincronizar o catálogo.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -189,13 +260,23 @@ export default function Index() {
       
       <main className="container py-8">
         {/* Title */}
-        <div className="mb-8 animate-slide-up">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">
-            Minha Coleção
-          </h1>
-          <p className="text-muted-foreground">
-            Gerencie seus Amiibos Nintendo
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 animate-slide-up">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">
+              Minha Coleção
+            </h1>
+            <p className="text-muted-foreground">
+              Gerencie seus Amiibos Nintendo
+            </p>
+          </div>
+          <Button
+            variant="secondary"
+            onClick={syncAmiibos}
+            disabled={syncing}
+          >
+            <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+            {syncing ? 'Sincronizando...' : 'Sincronizar Catálogo'}
+          </Button>
         </div>
 
         {/* Stats */}
