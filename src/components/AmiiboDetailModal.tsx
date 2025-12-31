@@ -143,7 +143,7 @@ export function AmiiboDetailModal({
 
             {/* Release dates */}
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <img 
                   src="https://flagcdn.com/w20/jp.png" 
                   alt="Japan" 
@@ -151,7 +151,7 @@ export function AmiiboDetailModal({
                 />
                 <span>{formatDate(amiibo.release_jp)}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <img 
                   src="https://flagcdn.com/w20/us.png" 
                   alt="USA" 
@@ -159,7 +159,7 @@ export function AmiiboDetailModal({
                 />
                 <span>{formatDate(amiibo.release_na)}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <img 
                   src="https://flagcdn.com/w20/eu.png" 
                   alt="Europe" 
@@ -167,7 +167,7 @@ export function AmiiboDetailModal({
                 />
                 <span>{formatDate(amiibo.release_eu)}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <img 
                   src="https://flagcdn.com/w20/au.png" 
                   alt="Australia" 
