@@ -8,6 +8,7 @@ interface AmiiboCardProps {
   name: string;
   imagePath: string | null;
   series: string | null;
+  type: string | null;
   isInCollection?: boolean;
   isBoxed?: boolean;
   onAdd?: () => void;
@@ -28,6 +29,7 @@ export function AmiiboCard({
   name,
   imagePath,
   series,
+  type,
   isInCollection = false,
   isBoxed = false,
   onAdd,
@@ -75,11 +77,18 @@ export function AmiiboCard({
         <h3 className="font-bold text-foreground text-lg leading-tight line-clamp-2">
           {name}
         </h3>
-        {series && (
-          <p className="text-sm text-muted-foreground line-clamp-1">
-            {series}
-          </p>
-        )}
+        <div className="flex items-center gap-2">
+          {type && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+              {type}
+            </span>
+          )}
+          {series && (
+            <p className="text-sm text-muted-foreground line-clamp-1 truncate flex-1">
+              {series}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Actions */}

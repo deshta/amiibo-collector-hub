@@ -29,6 +29,7 @@ interface Amiibo {
   release_eu: string | null;
   release_jp: string | null;
   series: string | null;
+  type: string | null;
 }
 
 interface UserAmiibo {
@@ -50,6 +51,7 @@ export default function Index() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'collected' | 'missing'>('all');
   const [selectedSeries, setSelectedSeries] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedAmiibo, setSelectedAmiibo] = useState<Amiibo | null>(null);
 
@@ -178,18 +180,24 @@ export default function Index() {
     return uniqueSeries.sort();
   }, [amiibos]);
 
+  // Get unique types for filter
+  const typesList = useMemo(() => {
+    const uniqueTypes = [...new Set(amiibos.map(a => a.type).filter(Boolean))] as string[];
+    return uniqueTypes.sort();
+  }, [amiibos]);
+
   const filteredAmiibos = useMemo(() => {
     return amiibos.filter(amiibo => {
       const matchesSearch = amiibo.name.toLowerCase().includes(search.toLowerCase());
-      
       const matchesSeries = selectedSeries === 'all' || amiibo.series === selectedSeries;
+      const matchesType = selectedType === 'all' || amiibo.type === selectedType;
       const isInCollection = !!getUserAmiibo(amiibo.id);
       
-      if (filter === 'collected') return matchesSearch && matchesSeries && isInCollection;
-      if (filter === 'missing') return matchesSearch && matchesSeries && !isInCollection;
-      return matchesSearch && matchesSeries;
+      if (filter === 'collected') return matchesSearch && matchesSeries && matchesType && isInCollection;
+      if (filter === 'missing') return matchesSearch && matchesSeries && matchesType && !isInCollection;
+      return matchesSearch && matchesSeries && matchesType;
     });
-  }, [amiibos, search, selectedSeries, filter, userAmiibos]);
+  }, [amiibos, search, selectedSeries, selectedType, filter, userAmiibos]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAmiibos.length / ITEMS_PER_PAGE);
@@ -201,7 +209,7 @@ export default function Index() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, selectedSeries, filter]);
+  }, [search, selectedSeries, selectedType, filter]);
 
   const collectedCount = userAmiibos.length;
   const boxedCount = userAmiibos.filter(ua => ua.is_boxed).length;
@@ -260,7 +268,7 @@ export default function Index() {
             </div>
             
             <Select value={selectedSeries} onValueChange={setSelectedSeries}>
-              <SelectTrigger className="w-full sm:w-[220px] h-12 rounded-xl border-2 border-border">
+              <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-xl border-2 border-border">
                 <SelectValue placeholder="Filtrar por série" />
               </SelectTrigger>
               <SelectContent>
@@ -268,6 +276,20 @@ export default function Index() {
                 {seriesList.map(series => (
                   <SelectItem key={series} value={series}>
                     {series}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedType} onValueChange={setSelectedType}>
+              <SelectTrigger className="w-full sm:w-[150px] h-12 rounded-xl border-2 border-border">
+                <SelectValue placeholder="Filtrar por tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os tipos</SelectItem>
+                {typesList.map(type => (
+                  <SelectItem key={type} value={type}>
+                    {type}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -315,11 +337,12 @@ export default function Index() {
                   style={{ animationDelay: `${index * 30}ms` }}
                   onClick={() => setSelectedAmiibo(amiibo)}
                 >
-                  <AmiiboCard
+                <AmiiboCard
                     id={amiibo.id}
                     name={amiibo.name}
                     imagePath={amiibo.image_path}
                     series={amiibo.series}
+                    type={amiibo.type}
                     isInCollection={!!userAmiibo}
                     isBoxed={userAmiibo?.is_boxed || false}
                     onAdd={() => addToCollection(amiibo.id)}
