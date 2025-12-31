@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Mail, Lock, User, Sparkles, Star, Heart } from "lucide-react";
 
 export default function Auth() {
@@ -16,6 +18,7 @@ export default function Auth() {
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (user) {
@@ -32,14 +35,14 @@ export default function Auth() {
         const { error } = await signIn(email, password);
         if (error) {
           toast({
-            title: "Erro ao entrar",
-            description: error.message === "Invalid login credentials" ? "Email ou senha incorretos" : error.message,
+            title: t('auth.errorLogin'),
+            description: error.message === "Invalid login credentials" ? t('auth.invalidCredentials') : error.message,
             variant: "destructive",
           });
         } else {
           toast({
-            title: "Bem-vindo de volta!",
-            description: "Login realizado com sucesso.",
+            title: t('auth.welcomeBack'),
+            description: t('auth.loginSuccess'),
           });
           navigate("/");
         }
@@ -47,22 +50,22 @@ export default function Auth() {
         const { error } = await signUp(email, password, username);
         if (error) {
           toast({
-            title: "Erro ao criar conta",
-            description: error.message.includes("already registered") ? "Este email já está cadastrado" : error.message,
+            title: t('auth.errorSignup'),
+            description: error.message.includes("already registered") ? t('auth.alreadyRegistered') : error.message,
             variant: "destructive",
           });
         } else {
           toast({
-            title: "Conta criada!",
-            description: "Sua conta foi criada com sucesso.",
+            title: t('auth.accountCreated'),
+            description: t('auth.accountCreatedSuccess'),
           });
           navigate("/");
         }
       }
     } catch (err) {
       toast({
-        title: "Erro",
-        description: "Algo deu errado. Tente novamente.",
+        title: t('toast.error'),
+        description: t('auth.genericError'),
         variant: "destructive",
       });
     } finally {
@@ -72,6 +75,11 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+      {/* Language Switcher */}
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSwitcher />
+      </div>
+
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 text-primary/20 animate-float">
@@ -97,9 +105,9 @@ export default function Auth() {
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-lg mb-4">
             <span className="text-4xl">✨</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-foreground mb-2">Minha Coleção</h1>
+          <h1 className="text-3xl font-extrabold text-foreground mb-2">{t('auth.title')}</h1>
           <p className="text-muted-foreground">
-            {isLogin ? "Entre para gerenciar sua coleção" : "Crie sua conta e comece a colecionar"}
+            {isLogin ? t('auth.loginSubtitle') : t('auth.signupSubtitle')}
           </p>
         </div>
 
@@ -109,14 +117,14 @@ export default function Auth() {
             {!isLogin && (
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-foreground font-semibold">
-                  Nome de usuário
+                  {t('auth.username')}
                 </Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
                     id="username"
                     type="text"
-                    placeholder="Seu nome"
+                    placeholder={t('auth.usernamePlaceholder')}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className="pl-11 h-12 rounded-xl border-2 border-border focus:border-primary transition-colors"
@@ -127,14 +135,14 @@ export default function Auth() {
 
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground font-semibold">
-                Email
+                {t('auth.email')}
               </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
-                  placeholder="seu@email.com"
+                  placeholder={t('auth.emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -145,7 +153,7 @@ export default function Auth() {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-foreground font-semibold">
-                Senha
+                {t('auth.password')}
               </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -166,12 +174,12 @@ export default function Auth() {
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  {isLogin ? "Entrando..." : "Criando conta..."}
+                  {isLogin ? t('auth.loggingIn') : t('auth.signingUp')}
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
-                  {isLogin ? "Entrar" : "Criar conta"}
+                  {isLogin ? t('auth.login') : t('auth.signup')}
                 </span>
               )}
             </Button>
@@ -183,14 +191,14 @@ export default function Auth() {
               onClick={() => setIsLogin(!isLogin)}
               className="text-primary hover:underline font-semibold transition-colors"
             >
-              {isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Entre"}
+              {isLogin ? t('auth.noAccount') : t('auth.hasAccount')}
             </button>
           </div>
         </div>
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p>Organize e acompanhe sua coleção de Amiibos</p>
+          <p>{t('auth.footer')}</p>
         </div>
       </div>
     </div>
