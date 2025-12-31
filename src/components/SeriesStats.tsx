@@ -27,7 +27,7 @@ export function SeriesStats({ amiibos, userAmiibos }: SeriesStatsProps) {
     const seriesMap = new Map<string, { total: number; collected: number }>();
     
     amiibos.forEach(amiibo => {
-      const series = amiibo.series || 'Sem série';
+      const series = amiibo.series || t('stats.noSeries');
       const current = seriesMap.get(series) || { total: 0, collected: 0 };
       current.total++;
       if (collectedIds.has(amiibo.id)) {
@@ -45,7 +45,7 @@ export function SeriesStats({ amiibos, userAmiibos }: SeriesStatsProps) {
         percentage: Math.round((stats.collected / stats.total) * 100),
       }))
       .sort((a, b) => b.total - a.total);
-  }, [amiibos, userAmiibos]);
+  }, [amiibos, userAmiibos, t]);
 
   if (seriesStats.length === 0) return null;
 

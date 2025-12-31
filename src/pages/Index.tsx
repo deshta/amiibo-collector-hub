@@ -614,7 +614,7 @@ export default function Index() {
       {/* Footer */}
       <footer className="py-6 mt-8 border-t border-border/50">
         <div className="container flex items-center justify-center gap-2 text-sm text-muted-foreground">
-          <span>Feito com muito queijo</span>
+          <span>{t('footer.madeWith')}</span>
           <img 
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Bandeira_de_Minas_Gerais.svg/45px-Bandeira_de_Minas_Gerais.svg.png" 
             alt="Bandeira de Minas Gerais" 

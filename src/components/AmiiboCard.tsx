@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Check, Plus, Package, PackageOpen, Trash2, Heart, Sparkles, ThumbsUp, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
 
@@ -46,11 +47,12 @@ export function AmiiboCard({
 }: AmiiboCardProps) {
   const [imageError, setImageError] = useState(false);
   const imageUrl = getImageUrl(imagePath);
+  const { t } = useLanguage();
 
   const conditionConfig = {
-    new: { icon: Sparkles, label: 'Novo', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    used: { icon: ThumbsUp, label: 'Usado', color: 'text-amber-500', bg: 'bg-amber-500/10' },
-    damaged: { icon: AlertTriangle, label: 'Danificado', color: 'text-red-500', bg: 'bg-red-500/10' },
+    new: { icon: Sparkles, label: t('condition.new'), color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    used: { icon: ThumbsUp, label: t('condition.used'), color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    damaged: { icon: AlertTriangle, label: t('condition.damaged'), color: 'text-red-500', bg: 'bg-red-500/10' },
   };
 
   const ConditionIcon = conditionConfig[condition].icon;
@@ -142,17 +144,17 @@ export function AmiiboCard({
                 e.stopPropagation();
                 onToggleBoxed?.();
               }}
-              title={isBoxed ? "Clique para marcar como aberto" : "Clique para marcar como lacrado"}
+              title={isBoxed ? t('card.markAsUnboxed') : t('card.markAsBoxed')}
             >
               {isBoxed ? (
                 <>
                   <Package className="w-4 h-4" />
-                  <span className="text-xs">Lacrado</span>
+                  <span className="text-xs">{t('card.boxed')}</span>
                 </>
               ) : (
                 <>
                   <PackageOpen className="w-4 h-4" />
-                  <span className="text-xs">Aberto</span>
+                  <span className="text-xs">{t('card.unboxed')}</span>
                 </>
               )}
             </Button>
@@ -180,7 +182,7 @@ export function AmiiboCard({
               }}
             >
               <Plus className="w-4 h-4" />
-              Adicionar
+              {t('card.add')}
             </Button>
             <Button
               variant={isInWishlist ? "default" : "ghost"}
@@ -194,7 +196,7 @@ export function AmiiboCard({
                   ? "bg-pink-500 hover:bg-pink-600 text-white" 
                   : "text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10"
               )}
-              title={isInWishlist ? "Remover da wishlist" : "Adicionar à wishlist"}
+              title={isInWishlist ? t('card.removeFromWishlist') : t('card.addToWishlist')}
             >
               <Heart className={cn("w-4 h-4", isInWishlist && "fill-current")} />
             </Button>
