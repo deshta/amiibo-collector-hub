@@ -109,19 +109,35 @@ export function AmiiboDetailModal({
             {/* Release dates */}
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="flex items-center gap-2">
-                <span className="text-xl">🇯🇵</span>
+                <img 
+                  src="https://flagcdn.com/w20/jp.png" 
+                  alt="Japan" 
+                  className="w-5 h-auto rounded-sm"
+                />
                 <span>{formatDate(amiibo.release_jp)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xl">🇺🇸</span>
+                <img 
+                  src="https://flagcdn.com/w20/us.png" 
+                  alt="USA" 
+                  className="w-5 h-auto rounded-sm"
+                />
                 <span>{formatDate(amiibo.release_na)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xl">🇪🇺</span>
+                <img 
+                  src="https://flagcdn.com/w20/eu.png" 
+                  alt="Europe" 
+                  className="w-5 h-auto rounded-sm"
+                />
                 <span>{formatDate(amiibo.release_eu)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xl">🇦🇺</span>
+                <img 
+                  src="https://flagcdn.com/w20/au.png" 
+                  alt="Australia" 
+                  className="w-5 h-auto rounded-sm"
+                />
                 <span>{formatDate(amiibo.release_au)}</span>
               </div>
             </div>
