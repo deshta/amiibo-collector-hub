@@ -1,4 +1,4 @@
-import { Package, Calendar, Check, Plus, Trash2 } from 'lucide-react';
+import { Package, Calendar, Check, Plus, Trash2, Gamepad2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ interface AmiiboDetailModalProps {
     release_na: string | null;
     release_eu: string | null;
     release_jp: string | null;
+    series: string | null;
   } | null;
   isOpen: boolean;
   onClose: () => void;
@@ -89,6 +90,14 @@ export function AmiiboDetailModal({
 
           {/* Info */}
           <div className="w-full space-y-4">
+            {/* Series */}
+            {amiibo.series && (
+              <div className="flex items-center justify-center gap-2">
+                <Gamepad2 className="w-4 h-4 text-primary" />
+                <span className="text-lg font-medium text-primary">{amiibo.series}</span>
+              </div>
+            )}
+
             {/* Release dates */}
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div className="flex items-center gap-2">
