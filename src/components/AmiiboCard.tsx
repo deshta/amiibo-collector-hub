@@ -7,6 +7,7 @@ interface AmiiboCardProps {
   id: string;
   name: string;
   imagePath: string | null;
+  series: string | null;
   isInCollection?: boolean;
   isBoxed?: boolean;
   onAdd?: () => void;
@@ -26,6 +27,7 @@ const getImageUrl = (imagePath: string | null): string | null => {
 export function AmiiboCard({
   name,
   imagePath,
+  series,
   isInCollection = false,
   isBoxed = false,
   onAdd,
@@ -73,6 +75,11 @@ export function AmiiboCard({
         <h3 className="font-bold text-foreground text-lg leading-tight line-clamp-2">
           {name}
         </h3>
+        {series && (
+          <p className="text-sm text-muted-foreground line-clamp-1">
+            {series}
+          </p>
+        )}
       </div>
 
       {/* Actions */}

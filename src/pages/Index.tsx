@@ -370,6 +370,7 @@ export default function Index() {
                     id={amiibo.id}
                     name={amiibo.name}
                     imagePath={amiibo.image_path}
+                    series={amiibo.series}
                     isInCollection={!!userAmiibo}
                     isBoxed={userAmiibo?.is_boxed || false}
                     onAdd={() => addToCollection(amiibo.id)}
