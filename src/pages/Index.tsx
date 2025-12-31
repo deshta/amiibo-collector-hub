@@ -10,7 +10,7 @@ import { SeriesStats } from '@/components/SeriesStats';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Filter, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Loader2, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -52,6 +52,8 @@ export default function Index() {
   const [filter, setFilter] = useState<'all' | 'collected' | 'missing'>('all');
   const [selectedSeries, setSelectedSeries] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'name' | 'release_na' | 'release_jp'>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedAmiibo, setSelectedAmiibo] = useState<Amiibo | null>(null);
 
@@ -187,7 +189,7 @@ export default function Index() {
   }, [amiibos]);
 
   const filteredAmiibos = useMemo(() => {
-    return amiibos.filter(amiibo => {
+    const filtered = amiibos.filter(amiibo => {
       const matchesSearch = amiibo.name.toLowerCase().includes(search.toLowerCase());
       const matchesSeries = selectedSeries === 'all' || amiibo.series === selectedSeries;
       const matchesType = selectedType === 'all' || amiibo.type === selectedType;
@@ -197,7 +199,22 @@ export default function Index() {
       if (filter === 'missing') return matchesSearch && matchesSeries && matchesType && !isInCollection;
       return matchesSearch && matchesSeries && matchesType;
     });
-  }, [amiibos, search, selectedSeries, selectedType, filter, userAmiibos]);
+
+    // Sort the filtered results
+    return filtered.sort((a, b) => {
+      let comparison = 0;
+      
+      if (sortBy === 'name') {
+        comparison = a.name.localeCompare(b.name);
+      } else {
+        const dateA = a[sortBy] ? new Date(a[sortBy]!).getTime() : 0;
+        const dateB = b[sortBy] ? new Date(b[sortBy]!).getTime() : 0;
+        comparison = dateA - dateB;
+      }
+      
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+  }, [amiibos, search, selectedSeries, selectedType, filter, userAmiibos, sortBy, sortOrder]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAmiibos.length / ITEMS_PER_PAGE);
@@ -209,7 +226,7 @@ export default function Index() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, selectedSeries, selectedType, filter]);
+  }, [search, selectedSeries, selectedType, filter, sortBy, sortOrder]);
 
   const collectedCount = userAmiibos.length;
   const boxedCount = userAmiibos.filter(ua => ua.is_boxed).length;
@@ -294,6 +311,28 @@ export default function Index() {
                 ))}
               </SelectContent>
             </Select>
+
+            <Select value={sortBy} onValueChange={(value: 'name' | 'release_na' | 'release_jp') => setSortBy(value)}>
+              <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-xl border-2 border-border">
+                <ArrowUpDown className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="Ordenar por" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name">Nome (A-Z)</SelectItem>
+                <SelectItem value="release_na">Data (América)</SelectItem>
+                <SelectItem value="release_jp">Data (Japão)</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button
+              variant="glass"
+              size="icon"
+              className="h-12 w-12 rounded-xl border-2 border-border"
+              onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+              title={sortOrder === 'asc' ? 'Ordem crescente' : 'Ordem decrescente'}
+            >
+              <ArrowUpDown className={`w-4 h-4 transition-transform ${sortOrder === 'desc' ? 'rotate-180' : ''}`} />
+            </Button>
           </div>
           
           <div className="flex flex-wrap gap-2">
