@@ -1,4 +1,1 @@
 project_id = "qlqxczezbpchjnkjwyrd"
-
-[functions.sync-amiibo-types]
-verify_jwt = false
