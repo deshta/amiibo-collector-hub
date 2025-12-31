@@ -247,7 +247,9 @@ export default function Index() {
 
   const filteredAmiibos = useMemo(() => {
     const filtered = amiibos.filter(amiibo => {
-      const matchesSearch = amiibo.name.toLowerCase().includes(search.toLowerCase());
+      const searchLower = search.toLowerCase();
+      const matchesSearch = amiibo.name.toLowerCase().includes(searchLower) || 
+                           (amiibo.series?.toLowerCase().includes(searchLower) ?? false);
       const matchesSeries = selectedSeries === 'all' || amiibo.series === selectedSeries;
       const matchesType = selectedType === 'all' || amiibo.type === selectedType;
       const isInCollection = !!getUserAmiibo(amiibo.id);
@@ -337,7 +339,7 @@ export default function Index() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
-                placeholder="Buscar amiibos..."
+                placeholder="Buscar por nome ou série..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-11 h-12 rounded-xl border-2 border-border focus:border-primary"
