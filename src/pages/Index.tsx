@@ -6,6 +6,7 @@ import { Header } from '@/components/Header';
 import { AmiiboCard } from '@/components/AmiiboCard';
 import { AmiiboDetailModal } from '@/components/AmiiboDetailModal';
 import { CollectionStats } from '@/components/CollectionStats';
+import { SeriesStats } from '@/components/SeriesStats';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -296,6 +297,9 @@ export default function Index() {
           collected={collectedCount}
           boxed={boxedCount}
         />
+
+        {/* Series Stats */}
+        <SeriesStats amiibos={amiibos} userAmiibos={userAmiibos} />
 
         {/* Search & Filter */}
         <div className="flex flex-col gap-4 mb-8 animate-slide-up" style={{ animationDelay: '200ms' }}>
