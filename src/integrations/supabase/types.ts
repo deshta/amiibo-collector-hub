@@ -59,6 +59,8 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          birthdate: string | null
+          country: string | null
           created_at: string
           id: string
           language: string | null
@@ -67,6 +69,8 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          birthdate?: string | null
+          country?: string | null
           created_at?: string
           id: string
           language?: string | null
@@ -75,6 +79,8 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          birthdate?: string | null
+          country?: string | null
           created_at?: string
           id?: string
           language?: string | null
@@ -161,7 +167,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_user_account: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
