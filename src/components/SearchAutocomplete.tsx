@@ -19,6 +19,13 @@ interface SearchAutocompleteProps {
   className?: string;
 }
 
+// Helper to get full image URL from storage path
+const getImageUrl = (imagePath: string | null): string | null => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith('http')) return imagePath;
+  return `https://qlqxczezbpchjnkjwyrd.supabase.co/storage/v1/object/public/amiibo-images/${imagePath}`;
+};
+
 export function SearchAutocomplete({
   amiibos,
   value,
@@ -145,7 +152,7 @@ export function SearchAutocomplete({
             >
               {amiibo.image_path && (
                 <img
-                  src={amiibo.image_path}
+                  src={getImageUrl(amiibo.image_path) || ''}
                   alt={amiibo.name}
                   className="w-10 h-10 object-contain rounded-lg bg-muted/50"
                 />
