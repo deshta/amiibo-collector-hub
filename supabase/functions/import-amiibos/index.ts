@@ -18,7 +18,16 @@ interface AmiiboData {
 
 interface AmiiboJson {
   amiibos: Record<string, AmiiboData>;
+  game_series?: Record<string, string>;
 }
+
+// Map hex IDs to their series prefixes (first 3 chars of hex ID)
+const getSeriesFromHexId = (hexId: string, seriesMap: Record<string, string>): string | null => {
+  // The hex ID format is like "0x0000000000000000", we need the prefix (e.g., "0x000")
+  // The series map uses prefixes like "0x338", "0x364", etc.
+  const hexPrefix = hexId.substring(0, 5); // Get "0x000" from "0x0000000000000000"
+  return seriesMap[hexPrefix] || null;
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -31,9 +40,11 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get JSON data from request body
-    const amiiboJson: AmiiboJson = await req.json();
+    const requestData = await req.json();
+    const amiiboJson: AmiiboJson = requestData.amiibos ? requestData : { amiibos: {} };
+    const seriesMap: Record<string, string> = requestData.game_series || {};
     
-    if (!amiiboJson.amiibos) {
+    if (!amiiboJson.amiibos || Object.keys(amiiboJson.amiibos).length === 0) {
       throw new Error("Invalid JSON format: missing 'amiibos' key");
     }
 
@@ -47,7 +58,7 @@ serve(async (req) => {
       console.error("Error deleting existing data:", deleteError);
     }
 
-    // Transform data
+    // Transform data with series lookup
     const amiibos = Object.entries(amiiboJson.amiibos).map(([hexId, data]) => ({
       amiibo_hex_id: hexId,
       name: data.name,
@@ -55,6 +66,7 @@ serve(async (req) => {
       release_na: data.release.na || null,
       release_eu: data.release.eu || null,
       release_jp: data.release.jp || null,
+      series: getSeriesFromHexId(hexId, seriesMap),
     }));
 
     console.log(`Importing ${amiibos.length} amiibos...`);

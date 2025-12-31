@@ -27,6 +27,7 @@ interface Amiibo {
   release_na: string | null;
   release_eu: string | null;
   release_jp: string | null;
+  series: string | null;
 }
 
 interface UserAmiibo {
@@ -93,14 +94,26 @@ export default function Index() {
     setSyncing(true);
     try {
       // Fetch the JSON data from public folder
-      const response = await fetch('/data/amiibo-data.json');
-      if (!response.ok) throw new Error('Falha ao carregar dados');
+      const [amiiboResponse, seriesResponse] = await Promise.all([
+        fetch('/data/amiibo-data.json'),
+        fetch('/data/amiibo-series.json')
+      ]);
       
-      const jsonData = await response.json();
+      if (!amiiboResponse.ok) throw new Error('Falha ao carregar dados de amiibos');
+      if (!seriesResponse.ok) throw new Error('Falha ao carregar dados de séries');
+      
+      const amiiboData = await amiiboResponse.json();
+      const seriesData = await seriesResponse.json();
+      
+      // Merge amiibo data with series mapping
+      const mergedData = {
+        ...amiiboData,
+        game_series: seriesData.game_series
+      };
       
       // Call the edge function to import
       const { data, error } = await supabase.functions.invoke('import-amiibos', {
-        body: jsonData
+        body: mergedData
       });
 
       if (error) throw error;
