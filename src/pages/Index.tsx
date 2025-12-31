@@ -116,6 +116,18 @@ export default function Index() {
       if (error) throw error;
 
       setUserAmiibos([...userAmiibos, data]);
+      
+      // Remove from wishlist if it was there
+      if (wishlist.some(w => w.amiibo_id === amiiboId)) {
+        await supabase
+          .from('user_wishlist')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('amiibo_id', amiiboId);
+        
+        setWishlist(wishlist.filter(w => w.amiibo_id !== amiiboId));
+      }
+      
       toast({
         title: 'Adicionado!',
         description: 'Amiibo adicionado à sua coleção.',
