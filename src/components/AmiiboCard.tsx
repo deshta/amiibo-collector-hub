@@ -112,7 +112,7 @@ export function AmiiboCard({
         )}
         
         {/* Type and Condition badges */}
-        <div className="flex items-center gap-2 flex-wrap justify-center">
+        <div className="flex items-center gap-2 flex-wrap justify-center mt-2">
           {type && (
             <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium whitespace-nowrap">
               {type}
