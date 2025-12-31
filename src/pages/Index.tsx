@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Header } from '@/components/Header';
 import { AmiiboCard } from '@/components/AmiiboCard';
+import { AmiiboDetailModal } from '@/components/AmiiboDetailModal';
 import { CollectionStats } from '@/components/CollectionStats';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -46,6 +47,7 @@ export default function Index() {
   const [syncing, setSyncing] = useState(false);
   const [selectedSeries, setSelectedSeries] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedAmiibo, setSelectedAmiibo] = useState<Amiibo | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -381,7 +383,12 @@ export default function Index() {
             {paginatedAmiibos.map((amiibo, index) => {
               const userAmiibo = getUserAmiibo(amiibo.id);
               return (
-                <div key={amiibo.id} className="animate-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
+                <div 
+                  key={amiibo.id} 
+                  className="animate-fade-in cursor-pointer" 
+                  style={{ animationDelay: `${index * 30}ms` }}
+                  onClick={() => setSelectedAmiibo(amiibo)}
+                >
                   <AmiiboCard
                     id={amiibo.id}
                     name={amiibo.name}
@@ -456,6 +463,23 @@ export default function Index() {
           </div>
         )}
       </main>
+
+      {/* Detail Modal */}
+      <AmiiboDetailModal
+        amiibo={selectedAmiibo}
+        isOpen={!!selectedAmiibo}
+        onClose={() => setSelectedAmiibo(null)}
+        isInCollection={selectedAmiibo ? !!getUserAmiibo(selectedAmiibo.id) : false}
+        isBoxed={selectedAmiibo ? getUserAmiibo(selectedAmiibo.id)?.is_boxed || false : false}
+        onAdd={() => selectedAmiibo && addToCollection(selectedAmiibo.id)}
+        onRemove={() => selectedAmiibo && removeFromCollection(selectedAmiibo.id)}
+        onToggleBoxed={() => {
+          if (selectedAmiibo) {
+            const userAmiibo = getUserAmiibo(selectedAmiibo.id);
+            toggleBoxed(selectedAmiibo.id, userAmiibo?.is_boxed || false);
+          }
+        }}
+      />
     </div>
   );
 }
