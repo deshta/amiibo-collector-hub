@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, ImageOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { getAmiiboImageUrl } from '@/lib/amiibo-images';
@@ -31,8 +31,13 @@ export function SearchAutocomplete({
 }: SearchAutocompleteProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+
+  const handleImageError = (amiiboId: string) => {
+    setImageErrors(prev => new Set(prev).add(amiiboId));
+  };
 
   const suggestions = useMemo(() => {
     if (!value.trim()) return [];
@@ -145,13 +150,18 @@ export function SearchAutocomplete({
                   : 'hover:bg-muted'
               )}
             >
-              {amiibo.image_path && (
-                <img
-                  src={getAmiiboImageUrl(amiibo.image_path) || ''}
-                  alt={amiibo.name}
-                  className="w-10 h-10 object-contain rounded-lg bg-muted/50"
-                />
-              )}
+              <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-muted/50">
+                {amiibo.image_path && !imageErrors.has(amiibo.id) ? (
+                  <img
+                    src={getAmiiboImageUrl(amiibo.image_path) || ''}
+                    alt={amiibo.name}
+                    className="w-10 h-10 object-contain"
+                    onError={() => handleImageError(amiibo.id)}
+                  />
+                ) : (
+                  <ImageOff className="w-6 h-6 text-muted-foreground/50" />
+                )}
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-sm truncate">{amiibo.name}</p>
                 {amiibo.series && (

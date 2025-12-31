@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Plus, Package, PackageOpen, Trash2, Heart, Sparkles, ThumbsUp, AlertTriangle } from 'lucide-react';
+import { Check, Plus, Package, PackageOpen, Trash2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getAmiiboImageUrl } from '@/lib/amiibo-images';
@@ -86,7 +86,7 @@ export function AmiiboCard({
           />
         ) : (
           <div className="flex items-center justify-center h-full">
-            <Package className="w-16 h-16 text-muted-foreground/50" />
+            <ImageOff className="w-16 h-16 text-muted-foreground/50" />
           </div>
         )}
       </div>
