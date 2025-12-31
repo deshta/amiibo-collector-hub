@@ -107,25 +107,21 @@ export function AmiiboDetailModal({
             </div>
 
             {/* Release dates */}
-            <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-                <span className="text-muted-foreground">JP:</span>
+                <span className="text-xl">🇯🇵</span>
                 <span>{formatDate(amiibo.release_jp)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-                <span className="text-muted-foreground">NA:</span>
+                <span className="text-xl">🇺🇸</span>
                 <span>{formatDate(amiibo.release_na)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-                <span className="text-muted-foreground">EU:</span>
+                <span className="text-xl">🇪🇺</span>
                 <span>{formatDate(amiibo.release_eu)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-                <span className="text-muted-foreground">AU:</span>
+                <span className="text-xl">🇦🇺</span>
                 <span>{formatDate(amiibo.release_au)}</span>
               </div>
             </div>
