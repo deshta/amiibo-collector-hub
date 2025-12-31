@@ -204,17 +204,25 @@ export default function Index() {
   const toggleBoxed = async (amiiboId: string, currentValue: boolean) => {
     if (!user) return;
 
+    const newIsBoxed = !currentValue;
+    // If marking as boxed, also set condition to 'new'
+    const updateData = newIsBoxed 
+      ? { is_boxed: true, condition: 'new' }
+      : { is_boxed: false };
+
     try {
       const { error } = await supabase
         .from('user_amiibos')
-        .update({ is_boxed: !currentValue })
+        .update(updateData)
         .eq('user_id', user.id)
         .eq('amiibo_id', amiiboId);
 
       if (error) throw error;
 
       setUserAmiibos(userAmiibos.map(ua => 
-        ua.amiibo_id === amiiboId ? { ...ua, is_boxed: !currentValue } : ua
+        ua.amiibo_id === amiiboId 
+          ? { ...ua, is_boxed: newIsBoxed, ...(newIsBoxed ? { condition: 'new' as const } : {}) } 
+          : ua
       ));
     } catch (error) {
       console.error('Error updating boxed status:', error);
