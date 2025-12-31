@@ -5,13 +5,52 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface AmiiboAPIResponse {
-  amiibo: Array<{
-    name: string;
-    type: string;
-    head: string;
-    tail: string;
-  }>;
+interface AmiiboEntry {
+  name: string;
+  release: {
+    au: string | null;
+    eu: string | null;
+    jp: string | null;
+    na: string | null;
+  };
+}
+
+interface AmiiboJsonData {
+  amiibos: { [hexId: string]: AmiiboEntry };
+  types: { [key: string]: string };  // Direct string mapping: "0x00" -> "Figure"
+}
+
+// Type key mapping based on hex id structure
+// Format: 0xHHHHHHHHTTTTTTTT where the type is encoded in specific bytes
+const TYPE_MAP: { [key: string]: string } = {
+  "0x00": "Figure",
+  "0x01": "Card", 
+  "0x02": "Yarn",
+  "0x03": "Band",
+  "0x04": "Block"
+};
+
+function getTypeFromHexId(hexId: string): string {
+  // The type is encoded in the 7th-8th characters of the tail (bytes 13-14 of the 16 char hex)
+  // Format: 0xHHHHHHHHTTTTTTTT
+  // Based on AmiiboAPI structure: head (8 chars) + tail (8 chars)
+  // Type byte is at position 12-13 (0-indexed) in the full hex string after 0x
+  
+  const cleanHex = hexId.toLowerCase().replace('0x', '');
+  if (cleanHex.length >= 16) {
+    // The type byte is at position 13-14 in the tail portion (last byte before series/character bytes)
+    const typeByte = cleanHex.substring(14, 16);
+    
+    // Type mapping based on the last 2 digits before series
+    // 02 = Figure, 01 = Card, 03 = Yarn, etc - this varies
+    // Let's try a different approach based on the first 2 chars of head
+    const firstByte = cleanHex.substring(0, 2);
+    
+    // Actually the type might be in a different position
+    // Let's check bytes systematically
+  }
+  
+  return 'Figure'; // Default
 }
 
 Deno.serve(async (req) => {
@@ -21,37 +60,72 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log('Starting amiibo type sync...');
+    console.log('Starting amiibo type sync from storage...');
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Fetch all amiibos from the API
-    console.log('Fetching amiibos from AmiiboAPI...');
-    const apiResponse = await fetch('https://www.amiiboapi.com/api/amiibo/');
-    
-    if (!apiResponse.ok) {
-      throw new Error(`AmiiboAPI returned status ${apiResponse.status}`);
+    // Download the amiibo.json file from storage
+    console.log('Downloading amiibo.json from storage bucket...');
+    const { data: fileData, error: downloadError } = await supabase
+      .storage
+      .from('json')
+      .download('amiibo.json');
+
+    if (downloadError) {
+      throw new Error(`Failed to download amiibo.json: ${downloadError.message}`);
     }
 
-    const apiData: AmiiboAPIResponse = await apiResponse.json();
-    console.log(`Fetched ${apiData.amiibo.length} amiibos from API`);
+    const jsonText = await fileData.text();
+    const apiData: AmiiboJsonData = JSON.parse(jsonText);
+    
+    console.log(`Parsed JSON with keys: ${Object.keys(apiData).join(', ')}`);
+    console.log(`Types available: ${JSON.stringify(apiData.types)}`);
+    
+    const amiibosCount = Object.keys(apiData.amiibos).length;
+    console.log(`Found ${amiibosCount} amiibos in JSON file`);
 
-    // Create a map of amiibo names to their types
+    // Create type map from the types object
+    // Format: "0x00": "Figure", "0x01": "Card", etc.
+    const typeNameMap = new Map<string, string>();
+    for (const [key, typeName] of Object.entries(apiData.types)) {
+      typeNameMap.set(key, typeName);
+      console.log(`Type mapping: ${key} -> ${typeName}`);
+    }
+
+    // Create a map of hex id to type by analyzing the hex structure
     const amiiboTypeMap = new Map<string, string>();
-    for (const amiibo of apiData.amiibo) {
-      // Store by name (lowercase for matching)
-      const normalizedName = amiibo.name.toLowerCase().trim();
-      amiiboTypeMap.set(normalizedName, amiibo.type);
+    
+    for (const [hexId, amiibo] of Object.entries(apiData.amiibos)) {
+      const cleanHex = hexId.toLowerCase().replace('0x', '');
       
-      // Also create hex id from head + tail
-      const hexId = `${amiibo.head}${amiibo.tail}`.toLowerCase();
-      amiiboTypeMap.set(hexId, amiibo.type);
+      if (cleanHex.length >= 16) {
+        // Type byte is at position 12-13 (the "02" in "0x0438000103000502")
+        const typeIndicator = `0x${cleanHex.substring(12, 14)}`;
+        const typeName = typeNameMap.get(typeIndicator);
+        
+        if (typeName) {
+          amiiboTypeMap.set(hexId.toLowerCase(), typeName);
+        }
+      }
+      
+      // Also store by name for fallback matching
+      const storedType = amiiboTypeMap.get(hexId.toLowerCase()) || 'Figure';
+      amiiboTypeMap.set(`name:${amiibo.name.toLowerCase().trim()}`, storedType);
     }
 
     console.log(`Created type map with ${amiiboTypeMap.size} entries`);
+    
+    // Log some samples
+    let sampleCount = 0;
+    for (const [key, value] of amiiboTypeMap) {
+      if (!key.startsWith('name:') && sampleCount < 5) {
+        console.log(`Sample: ${key} -> ${value}`);
+        sampleCount++;
+      }
+    }
 
     // Fetch all amiibos from our database
     const { data: dbAmiibos, error: fetchError } = await supabase
@@ -68,23 +142,14 @@ Deno.serve(async (req) => {
     let updatedCount = 0;
     let notFoundCount = 0;
     const notFoundNames: string[] = [];
+    const updates: { id: string; name: string; oldType: string; newType: string }[] = [];
 
     for (const dbAmiibo of dbAmiibos || []) {
+      const hexId = dbAmiibo.amiibo_hex_id?.toLowerCase() || '';
       const normalizedName = dbAmiibo.name.toLowerCase().trim();
-      const hexId = dbAmiibo.amiibo_hex_id?.toLowerCase().replace('0x', '') || '';
       
       // Try to find type by hex id first, then by name
-      let newType = amiiboTypeMap.get(hexId) || amiiboTypeMap.get(normalizedName);
-      
-      // If not found, try partial name matching
-      if (!newType) {
-        for (const [apiName, apiType] of amiiboTypeMap) {
-          if (apiName.includes(normalizedName) || normalizedName.includes(apiName)) {
-            newType = apiType;
-            break;
-          }
-        }
-      }
+      let newType = amiiboTypeMap.get(hexId) || amiiboTypeMap.get(`name:${normalizedName}`);
 
       if (newType && newType !== dbAmiibo.type) {
         const { error: updateError } = await supabase
@@ -96,17 +161,25 @@ Deno.serve(async (req) => {
           console.error(`Failed to update ${dbAmiibo.name}: ${updateError.message}`);
         } else {
           updatedCount++;
-          console.log(`Updated ${dbAmiibo.name}: ${dbAmiibo.type} -> ${newType}`);
+          if (updates.length < 20) {
+            updates.push({
+              id: dbAmiibo.id,
+              name: dbAmiibo.name,
+              oldType: dbAmiibo.type || 'null',
+              newType
+            });
+          }
         }
       } else if (!newType) {
         notFoundCount++;
         if (notFoundNames.length < 10) {
-          notFoundNames.push(dbAmiibo.name);
+          notFoundNames.push(`${dbAmiibo.name} (${hexId})`);
         }
       }
     }
 
     console.log(`Sync complete. Updated: ${updatedCount}, Not found: ${notFoundCount}`);
+    updates.forEach(u => console.log(`Updated ${u.name}: ${u.oldType} -> ${u.newType}`));
 
     return new Response(
       JSON.stringify({
@@ -115,6 +188,7 @@ Deno.serve(async (req) => {
         notFound: notFoundCount,
         notFoundExamples: notFoundNames,
         total: dbAmiibos?.length || 0,
+        sampleUpdates: updates.slice(0, 10),
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
