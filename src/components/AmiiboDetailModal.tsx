@@ -71,7 +71,7 @@ export function AmiiboDetailModal({
         
         <div className="flex flex-col items-center gap-6">
           {/* Image - Real size */}
-          <div className="relative rounded-2xl bg-gradient-to-b from-muted/50 to-muted p-4">
+          <div className="rounded-2xl bg-gradient-to-b from-muted/50 to-muted p-4">
             {imageUrl ? (
               <img
                 src={imageUrl}
@@ -83,23 +83,21 @@ export function AmiiboDetailModal({
                 <Package className="w-20 h-20 text-muted-foreground/50" />
               </div>
             )}
-            
-            {/* Collection Badge */}
-            {isInCollection && (
-              <div className="absolute top-2 right-2">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-success shadow-md">
-                  <Check className="w-4 h-4 text-success-foreground" />
-                </div>
-              </div>
-            )}
+          </div>
 
-            {/* Wishlist Badge */}
+          {/* Status Badges */}
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            {isInCollection && (
+              <Badge variant="default" className="text-sm bg-success text-success-foreground">
+                <Check className="w-3 h-3 mr-1" />
+                Na coleção
+              </Badge>
+            )}
             {isInWishlist && !isInCollection && (
-              <div className="absolute top-2 right-2">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-pink-500 shadow-md">
-                  <Heart className="w-4 h-4 text-white fill-white" />
-                </div>
-              </div>
+              <Badge variant="default" className="text-sm bg-pink-500 text-white">
+                <Heart className="w-3 h-3 mr-1 fill-current" />
+                Na wishlist
+              </Badge>
             )}
           </div>
 
