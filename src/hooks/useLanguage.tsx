@@ -87,6 +87,7 @@ const translations = {
     'toast.updateError': 'Não foi possível atualizar o status.',
     'toast.conditionError': 'Não foi possível atualizar a condição.',
     'toast.wishlistError': 'Não foi possível atualizar a wishlist.',
+    'toast.boxedConditionChanged': 'Marcado como lacrado e condição alterada para Novo.',
     
     // Conditions
     'condition.new': 'Novo',
@@ -194,6 +195,7 @@ const translations = {
     'toast.updateError': 'No se pudo actualizar el estado.',
     'toast.conditionError': 'No se pudo actualizar la condición.',
     'toast.wishlistError': 'No se pudo actualizar la lista de deseos.',
+    'toast.boxedConditionChanged': 'Marcado como sellado y condición cambiada a Nuevo.',
     
     // Conditions
     'condition.new': 'Nuevo',
@@ -301,6 +303,7 @@ const translations = {
     'toast.updateError': 'Could not update status.',
     'toast.conditionError': 'Could not update condition.',
     'toast.wishlistError': 'Could not update wishlist.',
+    'toast.boxedConditionChanged': 'Marked as boxed and condition changed to New.',
     
     // Conditions
     'condition.new': 'New',

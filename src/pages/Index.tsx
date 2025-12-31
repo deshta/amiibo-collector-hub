@@ -224,6 +224,13 @@ export default function Index() {
           ? { ...ua, is_boxed: newIsBoxed, ...(newIsBoxed ? { condition: 'new' as const } : {}) } 
           : ua
       ));
+
+      if (newIsBoxed) {
+        toast({
+          title: t('toast.updated'),
+          description: t('toast.boxedConditionChanged'),
+        });
+      }
     } catch (error) {
       console.error('Error updating boxed status:', error);
       toast({
