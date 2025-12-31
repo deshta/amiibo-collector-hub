@@ -428,6 +428,21 @@ export default function Index() {
           }
         }}
       />
+
+      {/* Footer */}
+      <footer className="fixed bottom-0 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-lg border-t border-border/50 z-40">
+        <div className="container flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <span>Feito com muito queijo</span>
+          <img 
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Bandeira_de_Minas_Gerais.svg/45px-Bandeira_de_Minas_Gerais.svg.png" 
+            alt="Bandeira de Minas Gerais" 
+            className="h-4 w-auto rounded-sm"
+          />
+        </div>
+      </footer>
+
+      {/* Spacer for fixed footer */}
+      <div className="h-14" />
     </div>
   );
 }
