@@ -16,31 +16,37 @@ export type Database = {
     Tables: {
       amiibos: {
         Row: {
-          character_name: string
+          amiibo_hex_id: string | null
           created_at: string
           id: string
-          image_url: string | null
+          image_path: string | null
           name: string
-          release_date: string | null
-          series: string
+          release_au: string | null
+          release_eu: string | null
+          release_jp: string | null
+          release_na: string | null
         }
         Insert: {
-          character_name: string
+          amiibo_hex_id?: string | null
           created_at?: string
           id?: string
-          image_url?: string | null
+          image_path?: string | null
           name: string
-          release_date?: string | null
-          series: string
+          release_au?: string | null
+          release_eu?: string | null
+          release_jp?: string | null
+          release_na?: string | null
         }
         Update: {
-          character_name?: string
+          amiibo_hex_id?: string | null
           created_at?: string
           id?: string
-          image_url?: string | null
+          image_path?: string | null
           name?: string
-          release_date?: string | null
-          series?: string
+          release_au?: string | null
+          release_eu?: string | null
+          release_jp?: string | null
+          release_na?: string | null
         }
         Relationships: []
       }
