@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Check, Plus, Package, PackageOpen, Trash2, Heart, Sparkles, ThumbsUp, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
@@ -22,14 +23,6 @@ interface AmiiboCardProps {
   onToggleWishlist?: () => void;
 }
 
-// Helper to get full image URL from storage path
-const getImageUrl = (imagePath: string | null): string | null => {
-  if (!imagePath) return null;
-  // If it's already a full URL, return it
-  if (imagePath.startsWith('http')) return imagePath;
-  // Otherwise construct storage URL
-  return `https://qlqxczezbpchjnkjwyrd.supabase.co/storage/v1/object/public/amiibo-images/${imagePath}`;
-};
 
 export function AmiiboCard({
   name,
@@ -46,7 +39,7 @@ export function AmiiboCard({
   onToggleWishlist,
 }: AmiiboCardProps) {
   const [imageError, setImageError] = useState(false);
-  const imageUrl = getImageUrl(imagePath);
+  const imageUrl = getAmiiboImageUrl(imagePath);
   const { t } = useLanguage();
 
   const conditionConfig = {

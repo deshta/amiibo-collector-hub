@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 
 interface Amiibo {
   id: string;
@@ -19,12 +20,6 @@ interface SearchAutocompleteProps {
   className?: string;
 }
 
-// Helper to get full image URL from storage path
-const getImageUrl = (imagePath: string | null): string | null => {
-  if (!imagePath) return null;
-  if (imagePath.startsWith('http')) return imagePath;
-  return `https://qlqxczezbpchjnkjwyrd.supabase.co/storage/v1/object/public/amiibo-images/${imagePath}`;
-};
 
 export function SearchAutocomplete({
   amiibos,
@@ -152,7 +147,7 @@ export function SearchAutocomplete({
             >
               {amiibo.image_path && (
                 <img
-                  src={getImageUrl(amiibo.image_path) || ''}
+                  src={getAmiiboImageUrl(amiibo.image_path) || ''}
                   alt={amiibo.name}
                   className="w-10 h-10 object-contain rounded-lg bg-muted/50"
                 />
