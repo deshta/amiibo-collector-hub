@@ -26,6 +26,7 @@ export type Database = {
           release_jp: string | null
           release_na: string | null
           series: string | null
+          type: string | null
         }
         Insert: {
           amiibo_hex_id?: string | null
@@ -38,6 +39,7 @@ export type Database = {
           release_jp?: string | null
           release_na?: string | null
           series?: string | null
+          type?: string | null
         }
         Update: {
           amiibo_hex_id?: string | null
@@ -50,6 +52,7 @@ export type Database = {
           release_jp?: string | null
           release_na?: string | null
           series?: string | null
+          type?: string | null
         }
         Relationships: []
       }
