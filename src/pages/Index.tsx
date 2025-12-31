@@ -390,8 +390,15 @@ export default function Index() {
     setCurrentPage(1);
   }, [search, selectedSeries, selectedType, filter, sortBy, sortOrder]);
 
-  // Check if any filters are active
-  const hasActiveFilters = search !== '' || selectedSeries !== 'all' || selectedType !== 'all' || filter !== 'all';
+  // Check if any filters are active and count them
+  const activeFiltersCount = [
+    search !== '',
+    selectedSeries !== 'all',
+    selectedType !== 'all',
+    filter !== 'all'
+  ].filter(Boolean).length;
+  
+  const hasActiveFilters = activeFiltersCount > 0;
 
   const clearAllFilters = () => {
     setSearch('');
@@ -566,6 +573,9 @@ export default function Index() {
               >
                 <X className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('index.clearFilters')}</span>
+                <span className="ml-1 text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-full font-medium">
+                  {activeFiltersCount}
+                </span>
               </Button>
             )}
           </div>
