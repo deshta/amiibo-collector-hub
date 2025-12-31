@@ -58,7 +58,7 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, onSeriesClic
         <h2 className="text-lg font-bold text-foreground">{t('stats.collectionProgress')}</h2>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto pr-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-1 -m-1">
         {seriesStats.map((series) => {
           const isNoSeries = series.name === t('stats.noSeries');
           const filterValue = isNoSeries ? 'all' : series.name;
