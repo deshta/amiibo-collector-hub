@@ -1,4 +1,4 @@
-import { Package, Calendar, Check, Plus, Trash2, Gamepad2 } from 'lucide-react';
+import { Package, Calendar, Check, Plus, Trash2, Gamepad2, Heart } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface AmiiboDetailModalProps {
   amiibo: {
@@ -25,9 +26,11 @@ interface AmiiboDetailModalProps {
   onClose: () => void;
   isInCollection?: boolean;
   isBoxed?: boolean;
+  isInWishlist?: boolean;
   onAdd?: () => void;
   onRemove?: () => void;
   onToggleBoxed?: () => void;
+  onToggleWishlist?: () => void;
 }
 
 // Helper to get full image URL from storage path
@@ -49,9 +52,11 @@ export function AmiiboDetailModal({
   onClose,
   isInCollection = false,
   isBoxed = false,
+  isInWishlist = false,
   onAdd,
   onRemove,
   onToggleBoxed,
+  onToggleWishlist,
 }: AmiiboDetailModalProps) {
   if (!amiibo) return null;
 
@@ -84,6 +89,15 @@ export function AmiiboDetailModal({
               <div className="absolute top-2 right-2">
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-success shadow-md">
                   <Check className="w-4 h-4 text-success-foreground" />
+                </div>
+              </div>
+            )}
+
+            {/* Wishlist Badge */}
+            {isInWishlist && !isInCollection && (
+              <div className="absolute top-2 right-2">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-pink-500 shadow-md">
+                  <Heart className="w-4 h-4 text-white fill-white" />
                 </div>
               </div>
             )}
@@ -171,14 +185,27 @@ export function AmiiboDetailModal({
                   </Button>
                 </>
               ) : (
-                <Button
-                  variant="default"
-                  className="w-full"
-                  onClick={onAdd}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Adicionar à Coleção
-                </Button>
+                <>
+                  <Button
+                    variant="default"
+                    className="flex-1"
+                    onClick={onAdd}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Adicionar à Coleção
+                  </Button>
+                  <Button
+                    variant={isInWishlist ? "default" : "outline"}
+                    onClick={onToggleWishlist}
+                    className={cn(
+                      isInWishlist 
+                        ? "bg-pink-500 hover:bg-pink-600 text-white" 
+                        : "hover:text-pink-500 hover:border-pink-500"
+                    )}
+                  >
+                    <Heart className={cn("w-4 h-4", isInWishlist && "fill-current")} />
+                  </Button>
+                </>
               )}
             </div>
           </div>

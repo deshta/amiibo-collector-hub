@@ -325,6 +325,7 @@ export default function Index() {
           total={amiibos.length}
           collected={collectedCount}
           boxed={boxedCount}
+          wishlistCount={wishlist.length}
         />
 
         {/* Series Stats */}
@@ -532,6 +533,7 @@ export default function Index() {
         onClose={() => setSelectedAmiibo(null)}
         isInCollection={selectedAmiibo ? !!getUserAmiibo(selectedAmiibo.id) : false}
         isBoxed={selectedAmiibo ? getUserAmiibo(selectedAmiibo.id)?.is_boxed || false : false}
+        isInWishlist={selectedAmiibo ? isInWishlist(selectedAmiibo.id) : false}
         onAdd={() => selectedAmiibo && addToCollection(selectedAmiibo.id)}
         onRemove={() => selectedAmiibo && removeFromCollection(selectedAmiibo.id)}
         onToggleBoxed={() => {
@@ -540,6 +542,7 @@ export default function Index() {
             toggleBoxed(selectedAmiibo.id, userAmiibo?.is_boxed || false);
           }
         }}
+        onToggleWishlist={() => selectedAmiibo && toggleWishlist(selectedAmiibo.id)}
       />
 
       {/* Footer */}

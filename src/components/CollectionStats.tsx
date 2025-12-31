@@ -1,12 +1,13 @@
-import { Package, Trophy, Star, Box } from 'lucide-react';
+import { Package, Trophy, Star, Box, Heart } from 'lucide-react';
 
 interface CollectionStatsProps {
   total: number;
   collected: number;
   boxed: number;
+  wishlistCount: number;
 }
 
-export function CollectionStats({ total, collected, boxed }: CollectionStatsProps) {
+export function CollectionStats({ total, collected, boxed, wishlistCount }: CollectionStatsProps) {
   const percentage = total > 0 ? Math.round((collected / total) * 100) : 0;
 
   const stats = [
@@ -32,6 +33,13 @@ export function CollectionStats({ total, collected, boxed }: CollectionStatsProp
       bg: 'bg-success/10',
     },
     {
+      icon: Heart,
+      label: 'Wishlist',
+      value: wishlistCount,
+      color: 'text-pink-500',
+      bg: 'bg-pink-500/10',
+    },
+    {
       icon: Package,
       label: 'Progresso',
       value: `${percentage}%`,
@@ -41,7 +49,7 @@ export function CollectionStats({ total, collected, boxed }: CollectionStatsProp
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
       {stats.map((stat, index) => (
         <div
           key={stat.label}

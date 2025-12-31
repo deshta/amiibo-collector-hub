@@ -69,23 +69,6 @@ export function AmiiboCard({
         </div>
       )}
 
-      {/* Wishlist Button */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggleWishlist?.();
-        }}
-        className={cn(
-          "absolute top-2 left-2 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all",
-          isInWishlist 
-            ? "bg-pink-500 text-white" 
-            : "bg-background/80 text-muted-foreground hover:bg-pink-500/20 hover:text-pink-500"
-        )}
-        title={isInWishlist ? "Remover da wishlist" : "Adicionar à wishlist"}
-      >
-        <Heart className={cn("w-4 h-4", isInWishlist && "fill-current")} />
-      </button>
-
       {/* Image Container */}
       <div className="relative aspect-square rounded-xl bg-gradient-to-b from-muted/50 to-muted overflow-hidden mb-3">
         {imageUrl && !imageError ? (
@@ -150,18 +133,36 @@ export function AmiiboCard({
             </Button>
           </>
         ) : (
-          <Button
-            variant="default"
-            size="sm"
-            className="w-full"
-            onClick={(e) => {
-              e.stopPropagation();
-              onAdd?.();
-            }}
-          >
-            <Plus className="w-4 h-4" />
-            Adicionar
-          </Button>
+          <>
+            <Button
+              variant="default"
+              size="sm"
+              className="flex-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAdd?.();
+              }}
+            >
+              <Plus className="w-4 h-4" />
+              Adicionar
+            </Button>
+            <Button
+              variant={isInWishlist ? "default" : "ghost"}
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleWishlist?.();
+              }}
+              className={cn(
+                isInWishlist 
+                  ? "bg-pink-500 hover:bg-pink-600 text-white" 
+                  : "text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10"
+              )}
+              title={isInWishlist ? "Remover da wishlist" : "Adicionar à wishlist"}
+            >
+              <Heart className={cn("w-4 h-4", isInWishlist && "fill-current")} />
+            </Button>
+          </>
         )}
       </div>
     </div>
