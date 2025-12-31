@@ -1,4 +1,4 @@
-import { Package, Trophy, Star, Box, Heart } from 'lucide-react';
+import { Package, Trophy, Star, Box, Heart } from "lucide-react";
 
 interface CollectionStatsProps {
   total: number;
@@ -13,38 +13,38 @@ export function CollectionStats({ total, collected, boxed, wishlistCount }: Coll
   const stats = [
     {
       icon: Trophy,
-      label: 'Colecionados',
+      label: "Colecionados",
       value: collected,
-      color: 'text-primary',
-      bg: 'bg-primary/10',
+      color: "text-primary",
+      bg: "bg-primary/10",
     },
     {
       icon: Star,
-      label: 'Total Amiibos',
+      label: "Total Amiibos",
       value: total,
-      color: 'text-secondary-foreground',
-      bg: 'bg-secondary/30',
+      color: "text-secondary-foreground",
+      bg: "bg-secondary/30",
     },
     {
       icon: Box,
-      label: 'Na Caixa',
+      label: "Lacrado",
       value: boxed,
-      color: 'text-success',
-      bg: 'bg-success/10',
+      color: "text-success",
+      bg: "bg-success/10",
     },
     {
       icon: Heart,
-      label: 'Wishlist',
+      label: "Wishlist",
       value: wishlistCount,
-      color: 'text-pink-500',
-      bg: 'bg-pink-500/10',
+      color: "text-pink-500",
+      bg: "bg-pink-500/10",
     },
     {
       icon: Package,
-      label: 'Progresso',
+      label: "Progresso",
       value: `${percentage}%`,
-      color: 'text-accent',
-      bg: 'bg-accent/10',
+      color: "text-accent",
+      bg: "bg-accent/10",
     },
   ];
 
