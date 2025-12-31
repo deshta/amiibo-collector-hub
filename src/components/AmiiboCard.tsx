@@ -99,14 +99,14 @@ export function AmiiboCard({
       </div>
 
       {/* Info */}
-      <div className="space-y-2 mb-3 min-h-[72px]">
-        <h3 className="font-bold text-foreground text-base leading-snug min-h-[40px] line-clamp-2 text-center">
+      <div className="space-y-1 mb-3 min-h-[72px]">
+        <h3 className="font-bold text-foreground text-base leading-snug line-clamp-2 text-center">
           {name}
         </h3>
         
         {/* Series - below name, centered */}
         {series && (
-          <p className="text-xs text-muted-foreground line-clamp-1 text-center">
+          <p className="text-xs text-muted-foreground line-clamp-1 text-center -mt-0.5">
             {series}
           </p>
         )}
