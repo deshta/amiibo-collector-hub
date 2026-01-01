@@ -15,6 +15,12 @@ const translations = {
     // Header
     'header.toggleTheme': 'Alternar tema',
     'header.signOut': 'Sair',
+    'header.about': 'Sobre',
+    
+    // About
+    'about.version': 'Versão',
+    'about.releaseDate': 'Data de lançamento',
+    'about.description': 'Gerencie e acompanhe sua coleção de Amiibos Nintendo de forma fácil e organizada.',
     
     // Auth
     'auth.title': 'Minha Coleção',
@@ -165,6 +171,12 @@ const translations = {
     // Header
     'header.toggleTheme': 'Cambiar tema',
     'header.signOut': 'Salir',
+    'header.about': 'Acerca de',
+    
+    // About
+    'about.version': 'Versión',
+    'about.releaseDate': 'Fecha de lanzamiento',
+    'about.description': 'Gestiona y sigue tu colección de Amiibos Nintendo de forma fácil y organizada.',
     
     // Auth
     'auth.title': 'Mi Colección',
@@ -315,6 +327,12 @@ const translations = {
     // Header
     'header.toggleTheme': 'Toggle theme',
     'header.signOut': 'Sign out',
+    'header.about': 'About',
+    
+    // About
+    'about.version': 'Version',
+    'about.releaseDate': 'Release date',
+    'about.description': 'Manage and track your Nintendo Amiibo collection easily and organized.',
     
     // Auth
     'auth.title': 'My Collection',
