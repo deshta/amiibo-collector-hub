@@ -84,7 +84,7 @@ export default function Index() {
   const [filterFromStats, setFilterFromStats] = useState(false);
   const [selectedSeries, setSelectedSeries] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'release_na' | 'release_jp'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'release_na' | 'release_jp' | 'release_eu' | 'release_au'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => getItemsPerPageFromCookie());
@@ -513,7 +513,7 @@ export default function Index() {
               </SelectContent>
             </Select>
 
-            <Select value={sortBy} onValueChange={(value: 'name' | 'release_na' | 'release_jp') => setSortBy(value)}>
+            <Select value={sortBy} onValueChange={(value: 'name' | 'release_na' | 'release_jp' | 'release_eu' | 'release_au') => setSortBy(value)}>
               <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-xl border-2 border-border">
                 <ArrowUpDown className="w-4 h-4 mr-2" />
                 <SelectValue placeholder={t('index.sortByName')} />
@@ -522,6 +522,8 @@ export default function Index() {
                 <SelectItem value="name">{t('index.sortByName')}</SelectItem>
                 <SelectItem value="release_na">{t('index.sortByDateNA')}</SelectItem>
                 <SelectItem value="release_jp">{t('index.sortByDateJP')}</SelectItem>
+                <SelectItem value="release_eu">{t('index.sortByDateEU')}</SelectItem>
+                <SelectItem value="release_au">{t('index.sortByDateAU')}</SelectItem>
               </SelectContent>
             </Select>
 
