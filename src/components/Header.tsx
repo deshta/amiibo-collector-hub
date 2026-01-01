@@ -59,7 +59,7 @@ export function Header() {
               <Gamepad2 className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-extrabold text-xl text-foreground">
-              Amiibo Collection
+              Amiibo Tracker
             </span>
           </Link>
 
