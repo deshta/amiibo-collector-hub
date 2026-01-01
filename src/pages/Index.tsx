@@ -8,6 +8,7 @@ import { AmiiboCard } from '@/components/AmiiboCard';
 import { AmiiboDetailModal } from '@/components/AmiiboDetailModal';
 import { CollectionStats } from '@/components/CollectionStats';
 import { SeriesStats } from '@/components/SeriesStats';
+import { Footer } from '@/components/Footer';
 import { SearchAutocomplete } from '@/components/SearchAutocomplete';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -731,16 +732,7 @@ export default function Index() {
       />
 
       {/* Footer */}
-      <footer className="py-6 mt-8 border-t border-border/50">
-        <div className="container flex items-center justify-center gap-2 text-sm text-muted-foreground">
-          <span>{t('footer.madeWith')}</span>
-          <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Bandeira_de_Minas_Gerais.svg/45px-Bandeira_de_Minas_Gerais.svg.png" 
-            alt="Bandeira de Minas Gerais" 
-            className="h-4 w-auto rounded-sm"
-          />
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
