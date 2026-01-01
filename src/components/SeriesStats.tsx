@@ -16,10 +16,11 @@ interface SeriesStatsProps {
   amiibos: Amiibo[];
   userAmiibos: UserAmiibo[];
   selectedSeries?: string;
-  onSeriesClick?: (series: string) => void;
+  showOnlyCollected?: boolean;
+  onSeriesClick?: (series: string, showOnlyCollected: boolean) => void;
 }
 
-export function SeriesStats({ amiibos, userAmiibos, selectedSeries, onSeriesClick }: SeriesStatsProps) {
+export function SeriesStats({ amiibos, userAmiibos, selectedSeries, showOnlyCollected, onSeriesClick }: SeriesStatsProps) {
   const { t } = useLanguage();
   
   const seriesStats = useMemo(() => {
@@ -61,8 +62,7 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, onSeriesClic
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-1 -m-1">
         {seriesStats.map((series) => {
           const isNoSeries = series.name === t('stats.noSeries');
-          const filterValue = isNoSeries ? 'all' : series.name;
-          const isSelected = selectedSeries === series.name || (selectedSeries === 'all' && isNoSeries);
+          const isSelected = selectedSeries === series.name && showOnlyCollected;
           
           return (
             <div 
@@ -72,8 +72,16 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, onSeriesClic
                   ? 'bg-primary/20 ring-2 ring-primary' 
                   : 'bg-muted/30 hover:bg-muted/50'
               }`}
-              onClick={() => onSeriesClick?.(selectedSeries === series.name ? 'all' : (isNoSeries ? 'all' : series.name))}
-              title={`Filtrar por ${series.name}`}
+              onClick={() => {
+                if (isSelected) {
+                  // Clicou de novo na série selecionada, limpa filtro
+                  onSeriesClick?.('all', false);
+                } else {
+                  // Seleciona a série e mostra só os colecionados
+                  onSeriesClick?.(isNoSeries ? 'all' : series.name, true);
+                }
+              }}
+              title={series.collected > 0 ? t('stats.filterCollected') : t('stats.noCollected')}
             >
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium text-foreground text-sm truncate flex-1 mr-2">

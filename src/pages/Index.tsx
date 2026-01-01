@@ -81,6 +81,7 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'collected' | 'missing' | 'wishlist'>('all');
+  const [filterFromStats, setFilterFromStats] = useState(false);
   const [selectedSeries, setSelectedSeries] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'name' | 'release_na' | 'release_jp'>('name');
@@ -453,9 +454,16 @@ export default function Index() {
           amiibos={amiibos} 
           userAmiibos={userAmiibos} 
           selectedSeries={selectedSeries}
-          onSeriesClick={(series) => {
+          showOnlyCollected={filterFromStats}
+          onSeriesClick={(series, showOnlyCollected) => {
             setSelectedSeries(series);
-            if (series !== 'all') {
+            setFilterFromStats(showOnlyCollected);
+            if (showOnlyCollected) {
+              setFilter('collected');
+            } else {
+              setFilter('all');
+            }
+            if (series !== 'all' || showOnlyCollected) {
               setTimeout(() => {
                 document.getElementById('amiibo-grid')?.scrollIntoView({ 
                   behavior: 'smooth', 

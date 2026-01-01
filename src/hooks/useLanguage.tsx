@@ -116,6 +116,8 @@ const translations = {
     'stats.progress': 'Progresso',
     'stats.collectionProgress': 'Progresso da Coleção por Série',
     'stats.noSeries': 'Sem série',
+    'stats.filterCollected': 'Clique para filtrar os amiibos colecionados desta série',
+    'stats.noCollected': 'Nenhum amiibo colecionado nesta série',
     
     // Footer
     'footer.madeWith': 'Feito com muito queijo',
@@ -264,6 +266,8 @@ const translations = {
     'stats.progress': 'Progreso',
     'stats.collectionProgress': 'Progreso de Colección por Serie',
     'stats.noSeries': 'Sin serie',
+    'stats.filterCollected': 'Clic para filtrar los amiibos coleccionados de esta serie',
+    'stats.noCollected': 'Ningún amiibo coleccionado en esta serie',
     
     // Footer
     'footer.madeWith': 'Hecho con mucho queso',
@@ -412,6 +416,8 @@ const translations = {
     'stats.progress': 'Progress',
     'stats.collectionProgress': 'Collection Progress by Series',
     'stats.noSeries': 'No series',
+    'stats.filterCollected': 'Click to filter collected amiibos from this series',
+    'stats.noCollected': 'No collected amiibos in this series',
     
     // Footer
     'footer.madeWith': 'Made with lots of cheese',
