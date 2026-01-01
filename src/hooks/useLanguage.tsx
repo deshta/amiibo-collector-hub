@@ -138,6 +138,11 @@ const translations = {
 
     // Footer
     "footer.madeWith": "Feito com muito queijo",
+    "footer.description": "A melhor forma de gerenciar e acompanhar sua coleção de Amiibos Nintendo.",
+    "footer.links": "Links Úteis",
+    "footer.contact": "Contato",
+    "footer.rights": "Todos os direitos reservados.",
+    "footer.builtWith": "Construído com",
 
     // Profile
     "profile.title": "Meu Perfil",
@@ -305,6 +310,11 @@ const translations = {
 
     // Footer
     "footer.madeWith": "Hecho con mucho queso",
+    "footer.description": "La mejor forma de gestionar y seguir tu colección de Amiibos Nintendo.",
+    "footer.links": "Enlaces Útiles",
+    "footer.contact": "Contacto",
+    "footer.rights": "Todos los derechos reservados.",
+    "footer.builtWith": "Construido con",
 
     // Profile
     "profile.title": "Mi Perfil",
@@ -472,6 +482,11 @@ const translations = {
 
     // Footer
     "footer.madeWith": "Made with lots of cheese",
+    "footer.description": "The best way to manage and track your Nintendo Amiibo collection.",
+    "footer.links": "Useful Links",
+    "footer.contact": "Contact",
+    "footer.rights": "All rights reserved.",
+    "footer.builtWith": "Built with",
 
     // Profile
     "profile.title": "My Profile",
