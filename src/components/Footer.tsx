@@ -15,14 +15,6 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">
               {t('footer.description')}
             </p>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>{t('footer.madeWith')}</span>
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Bandeira_de_Minas_Gerais.svg/45px-Bandeira_de_Minas_Gerais.svg.png" 
-                alt="Bandeira de Minas Gerais" 
-                className="h-4 w-auto rounded-sm"
-              />
-            </div>
           </div>
 
           {/* Links */}
@@ -75,9 +67,14 @@ export function Footer() {
         {/* Copyright */}
         <div className="pt-6 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <p>© {currentYear} Amiibo Tracker. {t('footer.rights')}</p>
-          <p className="flex items-center gap-1">
-            {t('footer.builtWith')} <Heart className="w-4 h-4 text-red-500 fill-red-500" />
-          </p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{t('footer.madeWith')}</span>
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Bandeira_de_Minas_Gerais.svg/45px-Bandeira_de_Minas_Gerais.svg.png" 
+                alt="Bandeira de Minas Gerais" 
+                className="h-4 w-auto rounded-sm"
+              />
+            </div>
         </div>
       </div>
     </footer>
