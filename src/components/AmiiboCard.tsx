@@ -81,6 +81,7 @@ export function AmiiboCard({
           <img
             src={imageUrl}
             alt={name}
+            loading="lazy"
             className="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-110"
             onError={() => setImageError(true)}
           />

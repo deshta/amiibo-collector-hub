@@ -155,6 +155,7 @@ export function SearchAutocomplete({
                   <img
                     src={getAmiiboImageUrl(amiibo.image_path) || ''}
                     alt={amiibo.name}
+                    loading="lazy"
                     className="w-10 h-10 object-contain"
                     onError={() => handleImageError(amiibo.id)}
                   />

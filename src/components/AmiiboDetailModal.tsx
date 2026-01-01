@@ -96,6 +96,7 @@ export function AmiiboDetailModal({
               <img
                 src={imageUrl}
                 alt={amiibo.name}
+                loading="lazy"
                 className="max-w-full h-auto"
                 onError={() => setImageError(true)}
               />
