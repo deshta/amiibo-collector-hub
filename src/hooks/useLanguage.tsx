@@ -21,6 +21,15 @@ const translations = {
     'about.version': 'Versão',
     'about.releaseDate': 'Data de lançamento',
     'about.description': 'Gerencie e acompanhe sua coleção de Amiibos Nintendo de forma fácil e organizada.',
+    'about.changelog': 'Novidades',
+    
+    // Changelog v1.0
+    'changelog.v1_feature1': 'Lançamento inicial do app',
+    'changelog.v1_feature2': 'Gerenciamento completo da coleção de Amiibos',
+    'changelog.v1_feature3': 'Sistema de wishlist para amiibos desejados',
+    'changelog.v1_feature4': 'Filtros por série, tipo e status',
+    'changelog.v1_feature5': 'Suporte a múltiplos idiomas (PT, ES, EN)',
+    'changelog.v1_feature6': 'Tema claro e escuro',
     
     // Auth
     'auth.title': 'Minha Coleção',
@@ -177,6 +186,15 @@ const translations = {
     'about.version': 'Versión',
     'about.releaseDate': 'Fecha de lanzamiento',
     'about.description': 'Gestiona y sigue tu colección de Amiibos Nintendo de forma fácil y organizada.',
+    'about.changelog': 'Novedades',
+    
+    // Changelog v1.0
+    'changelog.v1_feature1': 'Lanzamiento inicial de la app',
+    'changelog.v1_feature2': 'Gestión completa de la colección de Amiibos',
+    'changelog.v1_feature3': 'Sistema de lista de deseos para amiibos deseados',
+    'changelog.v1_feature4': 'Filtros por serie, tipo y estado',
+    'changelog.v1_feature5': 'Soporte a múltiples idiomas (PT, ES, EN)',
+    'changelog.v1_feature6': 'Tema claro y oscuro',
     
     // Auth
     'auth.title': 'Mi Colección',
@@ -333,6 +351,15 @@ const translations = {
     'about.version': 'Version',
     'about.releaseDate': 'Release date',
     'about.description': 'Manage and track your Nintendo Amiibo collection easily and organized.',
+    'about.changelog': 'Changelog',
+    
+    // Changelog v1.0
+    'changelog.v1_feature1': 'Initial app release',
+    'changelog.v1_feature2': 'Full Amiibo collection management',
+    'changelog.v1_feature3': 'Wishlist system for desired amiibos',
+    'changelog.v1_feature4': 'Filters by series, type, and status',
+    'changelog.v1_feature5': 'Multi-language support (PT, ES, EN)',
+    'changelog.v1_feature6': 'Light and dark theme',
     
     // Auth
     'auth.title': 'My Collection',
