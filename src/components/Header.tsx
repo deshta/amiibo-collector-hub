@@ -64,16 +64,6 @@ export function Header() {
           </Link>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowAbout(true)}
-              className="gap-2"
-            >
-              <Info className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('header.about')}</span>
-            </Button>
-
             <LanguageSwitcher />
             
             <Button
@@ -104,6 +94,16 @@ export function Header() {
                 </Button>
               </>
             )}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAbout(true)}
+              className="gap-2"
+            >
+              <Info className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('header.about')}</span>
+            </Button>
           </div>
         </div>
       </header>
