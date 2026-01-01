@@ -9,5 +9,5 @@ export const getAmiiboImageUrl = (imagePath: string | null): string | null => {
   
   // Load from local amiibo_image folder
   // Using dynamic import path for Vite
-  return `/amiibo_image/${imagePath}`;
+  return `/amiibo-image/${imagePath}`;
 };
