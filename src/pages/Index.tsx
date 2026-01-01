@@ -108,8 +108,8 @@ export default function Index() {
     try {
       const [amiibosResult, collectionResult, wishlistResult] = await Promise.all([
         supabase.from('amiibos').select('*').order('name'),
-        supabase.from('user_amiibos').select('*'),
-        supabase.from('user_wishlist').select('*'),
+        supabase.from('user_amiibos').select('*').eq('user_id', user.id),
+        supabase.from('user_wishlist').select('*').eq('user_id', user.id),
       ]);
 
       if (amiibosResult.error) throw amiibosResult.error;
