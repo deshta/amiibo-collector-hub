@@ -32,7 +32,7 @@ const translations = {
     "changelog.v1_feature6": "Tema claro e escuro",
 
     // Auth
-    "auth.title": "Amiibo Collection",
+    "auth.title": "Amiibo Tracker",
     "auth.loginSubtitle": "Entre para gerenciar sua coleção",
     "auth.signupSubtitle": "Crie sua conta e comece a colecionar",
     "auth.username": "Nome de usuário",
@@ -204,7 +204,7 @@ const translations = {
     "changelog.v1_feature6": "Tema claro y oscuro",
 
     // Auth
-    "auth.title": "Mi Colección",
+    "auth.title": "Amiibo Tracker",
     "auth.loginSubtitle": "Ingresa para gestionar tu colección",
     "auth.signupSubtitle": "Crea tu cuenta y empieza a coleccionar",
     "auth.username": "Nombre de usuario",
@@ -376,7 +376,7 @@ const translations = {
     "changelog.v1_feature6": "Light and dark theme",
 
     // Auth
-    "auth.title": "My Collection",
+    "auth.title": "Amiibo Tracker",
     "auth.loginSubtitle": "Sign in to manage your collection",
     "auth.signupSubtitle": "Create your account and start collecting",
     "auth.username": "Username",

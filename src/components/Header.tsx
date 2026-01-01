@@ -116,7 +116,7 @@ export function Header() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Gamepad2 className="w-5 h-5 text-primary" />
-              Amiibo Collection
+              Amiibo Tracker
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh] pr-4">
