@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
-import { Gamepad2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Gamepad2, ChevronDown } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { useLanguage } from '@/hooks/useLanguage';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface Amiibo {
   id: string;
@@ -22,6 +23,7 @@ interface SeriesStatsProps {
 
 export function SeriesStats({ amiibos, userAmiibos, selectedSeries, showOnlyCollected, onSeriesClick }: SeriesStatsProps) {
   const { t } = useLanguage();
+  const [isOpen, setIsOpen] = useState(true);
   
   const seriesStats = useMemo(() => {
     const collectedIds = new Set(userAmiibos.map(ua => ua.amiibo_id));
@@ -53,13 +55,20 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, showOnlyColl
   if (seriesStats.length === 0) return null;
 
   return (
-    <div className="glass-card rounded-2xl p-6 mb-8 animate-slide-up" style={{ animationDelay: '150ms' }}>
-      <div className="flex items-center gap-2 mb-4">
-        <Gamepad2 className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-bold text-foreground">{t('stats.collectionProgress')}</h2>
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-1 -m-1">
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <div className="glass-card rounded-2xl p-6 mb-8 animate-slide-up" style={{ animationDelay: '150ms' }}>
+        <CollapsibleTrigger className="w-full">
+          <div className="flex items-center justify-between cursor-pointer">
+            <div className="flex items-center gap-2">
+              <Gamepad2 className="w-5 h-5 text-primary" />
+              <h2 className="text-lg font-bold text-foreground">{t('stats.collectionProgress')}</h2>
+            </div>
+            <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+          </div>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent className="mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-1 -m-1">
         {seriesStats.map((series) => {
           const isNoSeries = series.name === t('stats.noSeries');
           const isSelected = selectedSeries === series.name && showOnlyCollected;
@@ -100,7 +109,9 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, showOnlyColl
             </div>
           );
         })}
+          </div>
+        </CollapsibleContent>
       </div>
-    </div>
+    </Collapsible>
   );
 }
