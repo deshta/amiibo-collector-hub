@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Gamepad2, ChevronDown } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
+const STORAGE_KEY = 'seriesStats_isOpen';
 
 interface Amiibo {
   id: string;
@@ -23,7 +25,14 @@ interface SeriesStatsProps {
 
 export function SeriesStats({ amiibos, userAmiibos, selectedSeries, showOnlyCollected, onSeriesClick }: SeriesStatsProps) {
   const { t } = useLanguage();
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(isOpen));
+  }, [isOpen]);
   
   const seriesStats = useMemo(() => {
     const collectedIds = new Set(userAmiibos.map(ua => ua.amiibo_id));
@@ -67,8 +76,8 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, showOnlyColl
           </div>
         </CollapsibleTrigger>
         
-        <CollapsibleContent className="mt-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-1 -m-1">
+        <CollapsibleContent className="overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-1 -m-1 mt-4">
         {seriesStats.map((series) => {
           const isNoSeries = series.name === t('stats.noSeries');
           const isSelected = selectedSeries === series.name && showOnlyCollected;
