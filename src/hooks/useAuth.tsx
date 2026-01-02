@@ -70,7 +70,11 @@ const signInWithGoogle = async () => {
         provider: "google",
         options: {
           // Importante: garante que volta pro lugar certo após o login
-          redirectTo: `http://localhost:5173/`,
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
 
