@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+// 👇 IMPORTANTE: Trazemos o AuthProvider de volta
+import { AuthProvider } from "@/hooks/useAuth"; 
+
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -15,16 +18,10 @@ const AppRoutes = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Escuta mudanças no login (Login ou Logout)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      
-      // Se acabou de logar
       if (event === 'SIGNED_IN') {
-        // Redireciona para a Home e limpa a URL suja
         navigate("/"); 
       }
-      
-      // Se deslogou
       if (event === 'SIGNED_OUT') {
         navigate("/auth");
       }
@@ -49,7 +46,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         {}
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
