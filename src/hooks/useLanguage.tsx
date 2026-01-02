@@ -56,6 +56,7 @@ const translations = {
     "auth.accountCreated": "Conta criada!",
     "auth.accountCreatedSuccess": "Sua conta foi criada com sucesso.",
     "auth.genericError": "Algo deu errado. Tente novamente.",
+    "auth.orContinueWith": "ou continue com",
 
     // Index
     "index.myCollection": "Minha Coleção",
@@ -228,6 +229,7 @@ const translations = {
     "auth.accountCreated": "¡Cuenta creada!",
     "auth.accountCreatedSuccess": "Tu cuenta fue creada con éxito.",
     "auth.genericError": "Algo salió mal. Inténtalo de nuevo.",
+    "auth.orContinueWith": "o continuar con",
 
     // Index
     "index.myCollection": "Mi Colección",
@@ -400,6 +402,7 @@ const translations = {
     "auth.accountCreated": "Account created!",
     "auth.accountCreatedSuccess": "Your account was created successfully.",
     "auth.genericError": "Something went wrong. Try again.",
+    "auth.orContinueWith": "or continue with",
 
     // Index
     "index.myCollection": "My Collection",
