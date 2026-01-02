@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Lock, User, Sparkles, Star, Heart, ArrowLeft } from "lucide-react";
+import { Mail, Lock, User, Sparkles, Star, Heart, ArrowLeft, Sun, Moon } from "lucide-react";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,9 +19,14 @@ export default function Auth() {
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, signInWithGoogle, user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   useEffect(() => {
     if (user) {
@@ -104,8 +110,20 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
-      {/* Language Switcher */}
-      <div className="absolute top-4 right-4 z-20">
+      {/* Theme and Language Switcher */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          className="rounded-full"
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-5 h-5" />
+          ) : (
+            <Moon className="w-5 h-5" />
+          )}
+        </Button>
         <LanguageSwitcher />
       </div>
 
