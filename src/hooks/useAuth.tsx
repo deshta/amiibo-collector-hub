@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error };
   };
 
-const handleGoogleLogin = async () => {
+const signInWithGoogle = async () => {
     try {
       setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
