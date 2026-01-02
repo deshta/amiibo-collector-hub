@@ -63,14 +63,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error };
   };
 
-  const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/`,
-      },
-    });
-    return { error };
+const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          // Importante: garante que volta pro lugar certo após o login
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) throw error;
+      
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro no login",
+        description: error.message,
+      });
+      setLoading(false);
+    }
   };
 
   const signOut = async () => {
