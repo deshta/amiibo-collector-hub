@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/hooks/useAuth';
+import { useAdmin } from '@/hooks/useAdmin';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ProfileMenu } from '@/components/ProfileMenu';
-import { Gamepad2, LogOut, User, Moon, Sun, Info, Sparkles } from 'lucide-react';
+import { Gamepad2, LogOut, User, Moon, Sun, Info, Sparkles, Shield } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -41,6 +42,7 @@ const CHANGELOG: ChangelogEntry[] = [
 
 export function Header() {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const { theme, setTheme } = useTheme();
   const { t } = useLanguage();
   const [showProfile, setShowProfile] = useState(false);
@@ -79,6 +81,14 @@ export function Header() {
 
             {user && (
               <>
+                {isAdmin && (
+                  <Button variant="ghost" size="sm" asChild className="gap-2">
+                    <Link to="/admin">
+                      <Shield className="w-4 h-4" />
+                      <span className="hidden sm:inline">Admin</span>
+                    </Link>
+                  </Button>
+                )}
                 <Button 
                   variant="ghost" 
                   size="sm" 
