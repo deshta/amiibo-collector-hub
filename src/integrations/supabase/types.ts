@@ -17,6 +17,7 @@ export type Database = {
       amiibos: {
         Row: {
           amiibo_hex_id: string | null
+          character: string | null
           created_at: string
           id: string
           image_path: string | null
@@ -30,6 +31,7 @@ export type Database = {
         }
         Insert: {
           amiibo_hex_id?: string | null
+          character?: string | null
           created_at?: string
           id?: string
           image_path?: string | null
@@ -43,6 +45,7 @@ export type Database = {
         }
         Update: {
           amiibo_hex_id?: string | null
+          character?: string | null
           created_at?: string
           id?: string
           image_path?: string | null
