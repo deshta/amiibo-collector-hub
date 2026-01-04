@@ -21,6 +21,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+const STORAGE_KEY = 'index_amiibos_filters';
+
+const defaultFilters: Filters = {
+  selectedType: '',
+  selectedSeries: '',
+  selectedCharacter: '',
+};
+
 interface Amiibo {
   id: string;
   name: string;
@@ -33,6 +41,12 @@ interface Amiibo {
   series: string | null;
   type: string | null;
   character: string | null;
+}
+
+interface Filters {
+  selectedType: string;
+  selectedSeries: string;
+  selectedCharacter: string;
 }
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
@@ -76,6 +90,12 @@ export default function Index() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+
+  // Load filters from localStorage
+  const [filters, setFilters] = useState<Filters>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : defaultFilters;
+  });
   
   const [amiibos, setAmiibos] = useState<Amiibo[]>([]);
   const [userAmiibos, setUserAmiibos] = useState<UserAmiibo[]>([]);
@@ -84,9 +104,9 @@ export default function Index() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'collected' | 'missing' | 'wishlist'>('all');
   const [filterFromStats, setFilterFromStats] = useState(false);
-  const [selectedSeries, setSelectedSeries] = useState<string>('all');
-  const [selectedType, setSelectedType] = useState<string>('all');
-  const [selectedCharacter, setSelectedCharacter] = useState<string>('all');
+  const [selectedSeries, setSelectedSeries] = useState<string>(filters.selectedSeries || 'all');
+  const [selectedType, setSelectedType] = useState<string>(filters.selectedType || 'all');
+  const [selectedCharacter, setSelectedCharacter] = useState<string>(filters.selectedCharacter || 'all');
   const [sortBy, setSortBy] = useState<'name' | 'release_na' | 'release_jp' | 'release_eu' | 'release_au'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
@@ -135,6 +155,22 @@ export default function Index() {
       setLoading(false);
     }
   };
+
+    // Save filters to localStorage
+    useEffect(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filters));
+    }, [filters]);
+  
+    const updateFilter = (key: keyof Filters, value: string) => {
+      setFilters(prev => ({ ...prev, [key]: value }));
+      setCurrentPage(1);
+    };
+  
+    const clearFilters = () => {
+      setFilters(defaultFilters);
+      localStorage.removeItem(STORAGE_KEY);
+      setCurrentPage(1);
+    };
 
   const addToCollection = async (amiiboId: string) => {
     if (!user) return;
@@ -418,6 +454,7 @@ export default function Index() {
     setSelectedType('all');
     setSelectedCharacter('all');
     setFilter('all');
+    clearFilters();
   };
 
   const collectedCount = userAmiibos.length;
@@ -435,6 +472,22 @@ export default function Index() {
   }
 
   if (!user) return null;
+
+  const handleSeriesChange = (value) => {
+    setSelectedSeries(value);
+    updateFilter('selectedSeries', value);
+  };
+
+  const handleTypeChange = (value) => {
+    setSelectedType(value);
+    updateFilter('selectedType', value);
+  };
+
+  const handleCharacterChange = (value) => {
+    setSelectedCharacter(value);
+    updateFilter('selectedCharacter', value);
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-hero">
@@ -497,7 +550,7 @@ export default function Index() {
               placeholder={t('index.searchPlaceholder')}
             />
             
-            <Select value={selectedSeries} onValueChange={setSelectedSeries}>
+            <Select value={selectedSeries} onValueChange={handleSeriesChange}>
               <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-xl border-2 border-border">
                 <SelectValue placeholder={t('index.filterBySeries')} />
               </SelectTrigger>
@@ -511,7 +564,7 @@ export default function Index() {
               </SelectContent>
             </Select>
 
-            <Select value={selectedType} onValueChange={setSelectedType}>
+            <Select value={selectedType} onValueChange={handleTypeChange}>
               <SelectTrigger className="w-full sm:w-[150px] h-12 rounded-xl border-2 border-border">
                 <SelectValue placeholder={t('index.filterByType')} />
               </SelectTrigger>
@@ -525,7 +578,7 @@ export default function Index() {
               </SelectContent>
             </Select>
 
-            <Select value={selectedCharacter} onValueChange={setSelectedCharacter}>
+            <Select value={selectedCharacter} onValueChange={handleCharacterChange}>
               <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-xl border-2 border-border">
                 <SelectValue placeholder={t('index.filterByCharacter')} />
               </SelectTrigger>

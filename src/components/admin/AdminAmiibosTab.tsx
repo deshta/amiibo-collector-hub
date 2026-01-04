@@ -43,7 +43,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 const STORAGE_KEY = 'admin_amiibos_filters';
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 20;
 
 interface Amiibo {
   id: string;
