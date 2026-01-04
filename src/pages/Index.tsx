@@ -32,6 +32,7 @@ interface Amiibo {
   release_jp: string | null;
   series: string | null;
   type: string | null;
+  character: string | null;
 }
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
@@ -85,6 +86,7 @@ export default function Index() {
   const [filterFromStats, setFilterFromStats] = useState(false);
   const [selectedSeries, setSelectedSeries] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedCharacter, setSelectedCharacter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'name' | 'release_na' | 'release_jp' | 'release_eu' | 'release_au'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
@@ -341,6 +343,12 @@ export default function Index() {
     return uniqueTypes.sort();
   }, [amiibos]);
 
+  // Get unique characters for filter
+  const charactersList = useMemo(() => {
+    const uniqueCharacters = [...new Set(amiibos.map(a => a.character).filter(Boolean))] as string[];
+    return uniqueCharacters.sort();
+  }, [amiibos]);
+
   const filteredAmiibos = useMemo(() => {
     const filtered = amiibos.filter(amiibo => {
       const searchLower = search.toLowerCase();
@@ -348,13 +356,14 @@ export default function Index() {
                            (amiibo.series?.toLowerCase().includes(searchLower) ?? false);
       const matchesSeries = selectedSeries === 'all' || amiibo.series === selectedSeries;
       const matchesType = selectedType === 'all' || amiibo.type === selectedType;
+      const matchesCharacter = selectedCharacter === 'all' || amiibo.character === selectedCharacter;
       const isInCollection = !!getUserAmiibo(amiibo.id);
       const inWishlist = isInWishlist(amiibo.id);
       
-      if (filter === 'collected') return matchesSearch && matchesSeries && matchesType && isInCollection;
-      if (filter === 'missing') return matchesSearch && matchesSeries && matchesType && !isInCollection;
-      if (filter === 'wishlist') return matchesSearch && matchesSeries && matchesType && inWishlist;
-      return matchesSearch && matchesSeries && matchesType;
+      if (filter === 'collected') return matchesSearch && matchesSeries && matchesType && matchesCharacter && isInCollection;
+      if (filter === 'missing') return matchesSearch && matchesSeries && matchesType && matchesCharacter && !isInCollection;
+      if (filter === 'wishlist') return matchesSearch && matchesSeries && matchesType && matchesCharacter && inWishlist;
+      return matchesSearch && matchesSeries && matchesType && matchesCharacter;
     });
 
     // Sort the filtered results
@@ -371,7 +380,7 @@ export default function Index() {
       
       return sortOrder === 'asc' ? comparison : -comparison;
     });
-  }, [amiibos, search, selectedSeries, selectedType, filter, userAmiibos, wishlist, sortBy, sortOrder]);
+  }, [amiibos, search, selectedSeries, selectedType, selectedCharacter, filter, userAmiibos, wishlist, sortBy, sortOrder]);
 
   const handleItemsPerPageChange = (value: string) => {
     const newValue = parseInt(value, 10) as ItemsPerPage;
@@ -390,13 +399,14 @@ export default function Index() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, selectedSeries, selectedType, filter, sortBy, sortOrder]);
+  }, [search, selectedSeries, selectedType, selectedCharacter, filter, sortBy, sortOrder]);
 
   // Check if any filters are active and count them
   const activeFiltersCount = [
     search !== '',
     selectedSeries !== 'all',
     selectedType !== 'all',
+    selectedCharacter !== 'all',
     filter !== 'all'
   ].filter(Boolean).length;
   
@@ -406,6 +416,7 @@ export default function Index() {
     setSearch('');
     setSelectedSeries('all');
     setSelectedType('all');
+    setSelectedCharacter('all');
     setFilter('all');
   };
 
@@ -509,6 +520,20 @@ export default function Index() {
                 {typesList.map(type => (
                   <SelectItem key={type} value={type}>
                     {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedCharacter} onValueChange={setSelectedCharacter}>
+              <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-xl border-2 border-border">
+                <SelectValue placeholder={t('index.filterByCharacter')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('index.allCharacters')}</SelectItem>
+                {charactersList.map(character => (
+                  <SelectItem key={character} value={character}>
+                    {character}
                   </SelectItem>
                 ))}
               </SelectContent>

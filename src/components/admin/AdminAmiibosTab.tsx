@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useToast } from '@/hooks/use-toast';
@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Loader2, Search, Gamepad2, Plus, Pencil, Trash2, X } from 'lucide-react';
+import { Loader2, Search, Gamepad2, Plus, Pencil, Trash2, X, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,14 +41,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
 
 const STORAGE_KEY = 'admin_amiibos_filters';
 const ITEMS_PER_PAGE = 10;
@@ -58,6 +50,7 @@ interface Amiibo {
   name: string;
   series: string | null;
   type: string | null;
+  character: string | null;
   image_path: string | null;
   amiibo_hex_id: string | null;
   release_na: string | null;
@@ -70,12 +63,14 @@ interface Filters {
   search: string;
   type: string;
   series: string;
+  character: string;
 }
 
 const emptyAmiibo: Omit<Amiibo, 'id'> = {
   name: '',
   series: '',
   type: '',
+  character: '',
   image_path: '',
   amiibo_hex_id: '',
   release_na: '',
@@ -88,6 +83,7 @@ const defaultFilters: Filters = {
   search: '',
   type: '',
   series: '',
+  character: '',
 };
 
 export function AdminAmiibosTab() {
@@ -96,6 +92,8 @@ export function AdminAmiibosTab() {
   const [amiibos, setAmiibos] = useState<Amiibo[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   
   // Load filters from localStorage
   const [filters, setFilters] = useState<Filters>(() => {
@@ -115,7 +113,7 @@ export function AdminAmiibosTab() {
     amiibo: Amiibo | null;
   }>({ open: false, amiibo: null });
 
-  // Get unique types and series from amiibos
+  // Get unique types, series and characters from amiibos
   const uniqueTypes = useMemo(() => {
     const types = new Set(amiibos.map(a => a.type).filter(Boolean));
     return Array.from(types).sort() as string[];
@@ -124,6 +122,11 @@ export function AdminAmiibosTab() {
   const uniqueSeries = useMemo(() => {
     const series = new Set(amiibos.map(a => a.series).filter(Boolean));
     return Array.from(series).sort() as string[];
+  }, [amiibos]);
+
+  const uniqueCharacters = useMemo(() => {
+    const characters = new Set(amiibos.map(a => a.character).filter(Boolean));
+    return Array.from(characters).sort() as string[];
   }, [amiibos]);
 
   // Save filters to localStorage
@@ -142,7 +145,7 @@ export function AdminAmiibosTab() {
     setCurrentPage(1);
   };
 
-  const hasActiveFilters = filters.search || filters.type || filters.series;
+  const hasActiveFilters = filters.search || filters.type || filters.series || filters.character;
 
   const fetchAmiibos = async () => {
     setLoading(true);
@@ -176,6 +179,7 @@ export function AdminAmiibosTab() {
         name: amiibo.name,
         series: amiibo.series || '',
         type: amiibo.type || '',
+        character: amiibo.character || '',
         image_path: amiibo.image_path || '',
         amiibo_hex_id: amiibo.amiibo_hex_id || '',
         release_na: amiibo.release_na || '',
@@ -187,6 +191,46 @@ export function AdminAmiibosTab() {
     } else {
       setFormData(emptyAmiibo);
       setEditDialog({ open: true, amiibo: null, isNew: true });
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      // Generate a unique filename
+      const timestamp = Date.now();
+      const extension = file.name.split('.').pop();
+      const filename = `${timestamp}.${extension}`;
+      
+      // Upload to Supabase storage
+      const { error: uploadError } = await supabase.storage
+        .from('amiibo-images')
+        .upload(filename, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Set the image path (just the filename, the getAmiiboImageUrl will handle it)
+      setFormData(prev => ({ ...prev, image_path: filename }));
+
+      toast({
+        title: t('toast.added'),
+        description: t('admin.imageUploaded'),
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: t('toast.error'),
+        description: t('admin.imageUploadError'),
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -206,6 +250,7 @@ export function AdminAmiibosTab() {
         name: formData.name.trim(),
         series: formData.series?.trim() || null,
         type: formData.type?.trim() || null,
+        character: formData.character?.trim() || null,
         image_path: formData.image_path?.trim() || null,
         amiibo_hex_id: formData.amiibo_hex_id?.trim() || null,
         release_na: formData.release_na || null,
@@ -292,7 +337,8 @@ export function AdminAmiibosTab() {
         amiibo.series?.toLowerCase().includes(searchLower);
       const matchesType = !filters.type || amiibo.type === filters.type;
       const matchesSeries = !filters.series || amiibo.series === filters.series;
-      return matchesSearch && matchesType && matchesSeries;
+      const matchesCharacter = !filters.character || amiibo.character === filters.character;
+      return matchesSearch && matchesType && matchesSeries && matchesCharacter;
     });
   }, [amiibos, filters]);
 
@@ -302,6 +348,23 @@ export function AdminAmiibosTab() {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
+
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    const pages: (number | 'ellipsis')[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push('ellipsis');
+      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+        pages.push(i);
+      }
+      if (currentPage < totalPages - 2) pages.push('ellipsis');
+      pages.push(totalPages);
+    }
+    return pages;
+  };
 
   if (loading) {
     return (
@@ -361,6 +424,18 @@ export function AdminAmiibosTab() {
                 ))}
               </SelectContent>
             </Select>
+            <Select value={filters.character} onValueChange={(value) => updateFilter('character', value)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={t('admin.character')} />
+              </SelectTrigger>
+              <SelectContent>
+                {uniqueCharacters.map((character) => (
+                  <SelectItem key={character} value={character}>
+                    {character}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
                 <X className="w-4 h-4" />
@@ -378,6 +453,7 @@ export function AdminAmiibosTab() {
                 <TableRow>
                   <TableHead className="w-16">{t('admin.image')}</TableHead>
                   <TableHead>{t('admin.name')}</TableHead>
+                  <TableHead>{t('admin.character')}</TableHead>
                   <TableHead>{t('admin.series')}</TableHead>
                   <TableHead>{t('admin.type')}</TableHead>
                   <TableHead className="text-right">{t('admin.actions')}</TableHead>
@@ -386,7 +462,7 @@ export function AdminAmiibosTab() {
               <TableBody>
                 {paginatedAmiibos.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                       {t('admin.noAmiibosFound')}
                     </TableCell>
                   </TableRow>
@@ -407,6 +483,7 @@ export function AdminAmiibosTab() {
                         )}
                       </TableCell>
                       <TableCell className="font-medium">{amiibo.name}</TableCell>
+                      <TableCell>{amiibo.character || '-'}</TableCell>
                       <TableCell>{amiibo.series || '-'}</TableCell>
                       <TableCell>
                         {amiibo.type && <Badge variant="secondary">{amiibo.type}</Badge>}
@@ -437,34 +514,42 @@ export function AdminAmiibosTab() {
           </div>
 
           {totalPages > 1 && (
-            <div className="mt-4">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    />
-                  </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        onClick={() => setCurrentPage(page)}
-                        isActive={currentPage === page}
-                        className="cursor-pointer"
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                {t('index.previous')}
+              </Button>
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, index) => (
+                  page === 'ellipsis' ? (
+                    <span key={`ellipsis-${index}`} className="px-2">...</span>
+                  ) : (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      className="min-w-[40px]"
+                    >
+                      {page}
+                    </Button>
+                  )
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                {t('index.next')}
+                <ChevronRight className="w-4 h-4" />
+              </Button>
             </div>
           )}
         </CardContent>
@@ -474,7 +559,7 @@ export function AdminAmiibosTab() {
       <Dialog open={editDialog.open} onOpenChange={(open) => 
         setEditDialog(prev => ({ ...prev, open }))
       }>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editDialog.isNew ? t('admin.addAmiibo') : t('admin.editAmiibo')}
@@ -487,6 +572,31 @@ export function AdminAmiibosTab() {
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="character">{t('admin.character')}</Label>
+              <Select 
+                value={formData.character || ''} 
+                onValueChange={(value) => setFormData({ ...formData, character: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('admin.selectCharacter')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {uniqueCharacters.map((character) => (
+                    <SelectItem key={character} value={character}>
+                      {character}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                id="character_new"
+                placeholder={t('admin.orTypeNew')}
+                value={formData.character || ''}
+                onChange={(e) => setFormData({ ...formData, character: e.target.value })}
+                className="mt-1"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -528,13 +638,46 @@ export function AdminAmiibosTab() {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="image_path">{t('admin.imagePath')}</Label>
-              <Input
-                id="image_path"
-                value={formData.image_path || ''}
-                onChange={(e) => setFormData({ ...formData, image_path: e.target.value })}
-                placeholder="image.png"
-              />
+              <Label>{t('admin.image')}</Label>
+              <div className="flex items-center gap-4">
+                {formData.image_path && (
+                  <img
+                    src={getAmiiboImageUrl(formData.image_path)}
+                    alt="Preview"
+                    className="w-16 h-16 object-contain rounded border"
+                  />
+                )}
+                <div className="flex-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingImage}
+                    className="gap-2"
+                  >
+                    {uploadingImage ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4" />
+                    )}
+                    {t('admin.uploadImage')}
+                  </Button>
+                  <Input
+                    id="image_path"
+                    value={formData.image_path || ''}
+                    onChange={(e) => setFormData({ ...formData, image_path: e.target.value })}
+                    placeholder={t('admin.orEnterPath')}
+                    className="mt-2"
+                  />
+                </div>
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="amiibo_hex_id">Hex ID</Label>
