@@ -235,6 +235,9 @@ const translations = {
     "admin.confirmDelete": "Excluir amiibo?",
     "admin.confirmDeleteDesc": "Tem certeza que deseja excluir {name}? Esta ação não pode ser desfeita.",
     "admin.delete": "Excluir",
+    "admin.clearFilters": "Limpar filtros",
+    "admin.selectSeries": "Selecione a série",
+    "admin.selectType": "Selecione o tipo",
   },
   es: {
     // Header
@@ -460,6 +463,9 @@ const translations = {
     "admin.confirmDelete": "¿Eliminar amiibo?",
     "admin.confirmDeleteDesc": "¿Estás seguro de que deseas eliminar {name}? Esta acción no se puede deshacer.",
     "admin.delete": "Eliminar",
+    "admin.clearFilters": "Limpiar filtros",
+    "admin.selectSeries": "Selecciona la serie",
+    "admin.selectType": "Selecciona el tipo",
   },
   en: {
     // Header
@@ -685,6 +691,9 @@ const translations = {
     "admin.confirmDelete": "Delete amiibo?",
     "admin.confirmDeleteDesc": "Are you sure you want to delete {name}? This action cannot be undone.",
     "admin.delete": "Delete",
+    "admin.clearFilters": "Clear filters",
+    "admin.selectSeries": "Select series",
+    "admin.selectType": "Select type",
   },
 };
 

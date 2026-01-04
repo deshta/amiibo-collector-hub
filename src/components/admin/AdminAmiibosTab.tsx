@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useToast } from '@/hooks/use-toast';
+import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import {
   Table,
   TableBody,
@@ -21,8 +22,15 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Loader2, Search, Gamepad2, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, Search, Gamepad2, Plus, Pencil, Trash2, X } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +41,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+
+const STORAGE_KEY = 'admin_amiibos_filters';
+const ITEMS_PER_PAGE = 10;
 
 interface Amiibo {
   id: string;
@@ -47,6 +66,12 @@ interface Amiibo {
   release_au: string | null;
 }
 
+interface Filters {
+  search: string;
+  type: string;
+  series: string;
+}
+
 const emptyAmiibo: Omit<Amiibo, 'id'> = {
   name: '',
   series: '',
@@ -59,12 +84,25 @@ const emptyAmiibo: Omit<Amiibo, 'id'> = {
   release_au: '',
 };
 
+const defaultFilters: Filters = {
+  search: '',
+  type: '',
+  series: '',
+};
+
 export function AdminAmiibosTab() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [amiibos, setAmiibos] = useState<Amiibo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Load filters from localStorage
+  const [filters, setFilters] = useState<Filters>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : defaultFilters;
+  });
+
   const [editDialog, setEditDialog] = useState<{
     open: boolean;
     amiibo: Amiibo | null;
@@ -76,6 +114,35 @@ export function AdminAmiibosTab() {
     open: boolean;
     amiibo: Amiibo | null;
   }>({ open: false, amiibo: null });
+
+  // Get unique types and series from amiibos
+  const uniqueTypes = useMemo(() => {
+    const types = new Set(amiibos.map(a => a.type).filter(Boolean));
+    return Array.from(types).sort() as string[];
+  }, [amiibos]);
+
+  const uniqueSeries = useMemo(() => {
+    const series = new Set(amiibos.map(a => a.series).filter(Boolean));
+    return Array.from(series).sort() as string[];
+  }, [amiibos]);
+
+  // Save filters to localStorage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filters));
+  }, [filters]);
+
+  const updateFilter = (key: keyof Filters, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+  };
+
+  const clearFilters = () => {
+    setFilters(defaultFilters);
+    localStorage.removeItem(STORAGE_KEY);
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters = filters.search || filters.type || filters.series;
 
   const fetchAmiibos = async () => {
     setLoading(true);
@@ -217,14 +284,24 @@ export function AdminAmiibosTab() {
     setDeleteDialog({ open: false, amiibo: null });
   };
 
-  const filteredAmiibos = amiibos.filter(amiibo => {
-    const searchLower = search.toLowerCase();
-    return (
-      amiibo.name.toLowerCase().includes(searchLower) ||
-      amiibo.series?.toLowerCase().includes(searchLower) ||
-      amiibo.type?.toLowerCase().includes(searchLower)
-    );
-  });
+  const filteredAmiibos = useMemo(() => {
+    return amiibos.filter(amiibo => {
+      const searchLower = filters.search.toLowerCase();
+      const matchesSearch = !filters.search || 
+        amiibo.name.toLowerCase().includes(searchLower) ||
+        amiibo.series?.toLowerCase().includes(searchLower);
+      const matchesType = !filters.type || amiibo.type === filters.type;
+      const matchesSeries = !filters.series || amiibo.series === filters.series;
+      return matchesSearch && matchesType && matchesSeries;
+    });
+  }, [amiibos, filters]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredAmiibos.length / ITEMS_PER_PAGE);
+  const paginatedAmiibos = filteredAmiibos.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   if (loading) {
     return (
@@ -250,18 +327,48 @@ export function AdminAmiibosTab() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-4 mb-6">
-            <div className="relative flex-1 max-w-sm">
+          <div className="flex flex-wrap items-center gap-4 mb-6">
+            <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 placeholder={t('admin.searchAmiibos')}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={filters.search}
+                onChange={(e) => updateFilter('search', e.target.value)}
                 className="pl-9"
               />
             </div>
+            <Select value={filters.type} onValueChange={(value) => updateFilter('type', value)}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder={t('admin.type')} />
+              </SelectTrigger>
+              <SelectContent>
+                {uniqueTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filters.series} onValueChange={(value) => updateFilter('series', value)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={t('admin.series')} />
+              </SelectTrigger>
+              <SelectContent>
+                {uniqueSeries.map((series) => (
+                  <SelectItem key={series} value={series}>
+                    {series}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
+                <X className="w-4 h-4" />
+                {t('admin.clearFilters')}
+              </Button>
+            )}
             <Badge variant="outline">
-              {amiibos.length} {t('admin.totalAmiibos')}
+              {filteredAmiibos.length} / {amiibos.length} {t('admin.totalAmiibos')}
             </Badge>
           </div>
 
@@ -277,19 +384,19 @@ export function AdminAmiibosTab() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredAmiibos.length === 0 ? (
+                {paginatedAmiibos.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                       {t('admin.noAmiibosFound')}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredAmiibos.map((amiibo) => (
+                  paginatedAmiibos.map((amiibo) => (
                     <TableRow key={amiibo.id}>
                       <TableCell>
                         {amiibo.image_path ? (
                           <img
-                            src={amiibo.image_path}
+                            src={getAmiiboImageUrl(amiibo.image_path)}
                             alt={amiibo.name}
                             className="w-12 h-12 object-contain rounded"
                           />
@@ -328,6 +435,38 @@ export function AdminAmiibosTab() {
               </TableBody>
             </Table>
           </div>
+
+          {totalPages > 1 && (
+            <div className="mt-4">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(page)}
+                        isActive={currentPage === page}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -353,19 +492,39 @@ export function AdminAmiibosTab() {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="series">{t('admin.series')}</Label>
-                <Input
-                  id="series"
-                  value={formData.series || ''}
-                  onChange={(e) => setFormData({ ...formData, series: e.target.value })}
-                />
+                <Select 
+                  value={formData.series || ''} 
+                  onValueChange={(value) => setFormData({ ...formData, series: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('admin.selectSeries')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniqueSeries.map((series) => (
+                      <SelectItem key={series} value={series}>
+                        {series}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="type">{t('admin.type')}</Label>
-                <Input
-                  id="type"
-                  value={formData.type || ''}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                />
+                <Select 
+                  value={formData.type || ''} 
+                  onValueChange={(value) => setFormData({ ...formData, type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('admin.selectType')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniqueTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="grid gap-2">
@@ -374,7 +533,7 @@ export function AdminAmiibosTab() {
                 id="image_path"
                 value={formData.image_path || ''}
                 onChange={(e) => setFormData({ ...formData, image_path: e.target.value })}
-                placeholder="https://..."
+                placeholder="image.png"
               />
             </div>
             <div className="grid gap-2">
