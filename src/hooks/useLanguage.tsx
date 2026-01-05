@@ -15,6 +15,7 @@ const translations = {
     // Header
     "header.toggleTheme": "Alternar tema",
     "header.signOut": "Sair",
+    "header.profile": "Perfil",
     "header.about": "Sobre",
 
     // About
@@ -251,6 +252,7 @@ const translations = {
   es: {
     // Header
     "header.toggleTheme": "Cambiar tema",
+    "header.profile": "Perfil",
     "header.signOut": "Salir",
     "header.about": "Acerca de",
 
@@ -488,6 +490,7 @@ const translations = {
   en: {
     // Header
     "header.toggleTheme": "Toggle theme",
+    "header.profile": "Profile",
     "header.signOut": "Sign out",
     "header.about": "About",
 
