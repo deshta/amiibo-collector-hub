@@ -65,19 +65,19 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, showOnlyColl
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <div className="glass-card rounded-2xl p-6 mb-8 animate-slide-up" style={{ animationDelay: '150ms' }}>
+      <div className="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 animate-slide-up" style={{ animationDelay: '150ms' }}>
         <CollapsibleTrigger className="w-full">
           <div className="flex items-center justify-between cursor-pointer">
             <div className="flex items-center gap-2">
-              <Gamepad2 className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-foreground">{t('stats.collectionProgress')}</h2>
+              <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              <h2 className="text-base sm:text-lg font-bold text-foreground">{t('stats.collectionProgress')}</h2>
             </div>
-            <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
           </div>
         </CollapsibleTrigger>
         
         <CollapsibleContent className="overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-1 -m-1 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 max-h-[300px] sm:max-h-[400px] overflow-y-auto p-1 -m-1 mt-3 sm:mt-4">
         {seriesStats.map((series) => {
           const isNoSeries = series.name === t('stats.noSeries');
           const isSelected = selectedSeries === series.name && showOnlyCollected;
@@ -85,33 +85,31 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, showOnlyColl
           return (
             <div 
               key={series.name} 
-              className={`p-3 rounded-xl transition-all cursor-pointer ${
+              className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all cursor-pointer ${
                 isSelected 
                   ? 'bg-primary/20 ring-2 ring-primary' 
                   : 'bg-muted/30 hover:bg-muted/50'
               }`}
               onClick={() => {
                 if (isSelected) {
-                  // Clicou de novo na série selecionada, limpa filtro
                   onSeriesClick?.('all', false);
                 } else {
-                  // Seleciona a série e mostra só os colecionados
                   onSeriesClick?.(isNoSeries ? 'all' : series.name, true);
                 }
               }}
               title={series.collected > 0 ? t('stats.filterCollected') : t('stats.noCollected')}
             >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-foreground text-sm truncate flex-1 mr-2">
+            <div className="flex items-center justify-between mb-1 sm:mb-2">
+              <span className="font-medium text-foreground text-xs sm:text-sm truncate flex-1 mr-2">
                 {series.name}
               </span>
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
+              <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
                 {series.collected}/{series.total}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <Progress value={series.percentage} className="h-2 flex-1" />
-              <span className="text-xs font-medium text-primary w-10 text-right">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Progress value={series.percentage} className="h-1.5 sm:h-2 flex-1" />
+              <span className="text-[10px] sm:text-xs font-medium text-primary w-8 sm:w-10 text-right">
                 {series.percentage}%
               </span>
             </div>
