@@ -7,7 +7,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ProfileMenu } from '@/components/ProfileMenu';
-import { Gamepad2, LogOut, User, Moon, Sun, Info, Sparkles, Shield } from 'lucide-react';
+import { Gamepad2, LogOut, User, Moon, Sun, Info, Sparkles, Shield, Menu, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,13 @@ import {
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
 const APP_VERSION = '1.0';
 
@@ -47,9 +54,15 @@ export function Header() {
   const { t } = useLanguage();
   const [showProfile, setShowProfile] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  const handleMobileNavigation = (action: () => void) => {
+    action();
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -65,55 +78,133 @@ export function Header() {
             </span>
           </Link>
 
-          <div className="flex items-center gap-1 sm:gap-2">
+          {/* Desktop Navigation */}
+          <div className="hidden sm:flex items-center gap-2">
             <LanguageSwitcher />
             
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="rounded-full w-8 h-8 sm:w-9 sm:h-9"
+              className="rounded-full w-9 h-9"
               aria-label={t('header.toggleTheme')}
             >
-              <Sun className="h-4 w-4 sm:h-5 sm:w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 sm:h-5 sm:w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </Button>
 
             {user && (
               <>
                 {isAdmin && (
-                  <Button variant="ghost" size="icon" asChild className="w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2">
+                  <Button variant="ghost" asChild className="px-3 py-2">
                     <Link to="/admin">
-                      <Shield className="w-4 h-4" />
-                      <span className="hidden sm:inline sm:ml-2">Admin</span>
+                      <Shield className="w-4 h-4 mr-2" />
+                      Admin
                     </Link>
                   </Button>
                 )}
                 <Button 
                   variant="ghost" 
-                  size="icon"
                   onClick={() => setShowProfile(true)}
-                  className="w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2"
+                  className="px-3 py-2"
                 >
-                  <User className="w-4 h-4" />
-                  <span className="hidden sm:inline sm:ml-2">{user.email}</span>
+                  <User className="w-4 h-4 mr-2" />
+                  {user.email}
                 </Button>
-                <Button variant="ghost" size="icon" onClick={signOut} className="w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2">
-                  <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline sm:ml-2">{t('header.signOut')}</span>
+                <Button variant="ghost" onClick={signOut} className="px-3 py-2">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  {t('header.signOut')}
                 </Button>
               </>
             )}
 
             <Button
               variant="ghost"
-              size="icon"
               onClick={() => setShowAbout(true)}
-              className="w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2"
+              className="px-3 py-2"
             >
-              <Info className="w-4 h-4" />
-              <span className="hidden sm:inline sm:ml-2">{t('header.about')}</span>
+              <Info className="w-4 h-4 mr-2" />
+              {t('header.about')}
             </Button>
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="flex sm:hidden items-center gap-1">
+            <LanguageSwitcher />
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="rounded-full w-8 h-8"
+              aria-label={t('header.toggleTheme')}
+            >
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            </Button>
+
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="w-8 h-8">
+                  <Menu className="w-5 h-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px] sm:w-[350px]">
+                <SheetHeader>
+                  <SheetTitle className="flex items-center gap-2">
+                    <Gamepad2 className="w-5 h-5 text-primary" />
+                    Menu
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col gap-2 mt-6">
+                  {user && (
+                    <>
+                      {isAdmin && (
+                        <Button 
+                          variant="ghost" 
+                          asChild 
+                          className="justify-start"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Link to="/admin">
+                            <Shield className="w-4 h-4 mr-3" />
+                            Admin
+                          </Link>
+                        </Button>
+                      )}
+                      <Button 
+                        variant="ghost" 
+                        onClick={() => handleMobileNavigation(() => setShowProfile(true))}
+                        className="justify-start"
+                      >
+                        <User className="w-4 h-4 mr-3" />
+                        {t('header.profile')}
+                      </Button>
+                      <Separator className="my-2" />
+                      <Button 
+                        variant="ghost" 
+                        onClick={() => handleMobileNavigation(signOut)}
+                        className="justify-start text-destructive hover:text-destructive"
+                      >
+                        <LogOut className="w-4 h-4 mr-3" />
+                        {t('header.signOut')}
+                      </Button>
+                    </>
+                  )}
+
+                  <Separator className="my-2" />
+
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleMobileNavigation(() => setShowAbout(true))}
+                    className="justify-start"
+                  >
+                    <Info className="w-4 h-4 mr-3" />
+                    {t('header.about')}
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>
