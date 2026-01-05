@@ -51,18 +51,18 @@ export function CollectionStats({ total, collected, boxed, wishlistCount }: Coll
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+    <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-4 mb-6 sm:mb-8">
       {stats.map((stat, index) => (
         <div
           key={stat.label}
-          className="glass-card rounded-2xl p-4 animate-slide-up"
+          className="glass-card rounded-xl sm:rounded-2xl p-2 sm:p-4 animate-slide-up"
           style={{ animationDelay: `${index * 100}ms` }}
         >
-          <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl ${stat.bg} mb-3`}>
-            <stat.icon className={`w-5 h-5 ${stat.color}`} />
+          <div className={`inline-flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl ${stat.bg} mb-1 sm:mb-3`}>
+            <stat.icon className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${stat.color}`} />
           </div>
-          <div className="text-2xl font-extrabold text-foreground">{stat.value}</div>
-          <div className="text-sm text-muted-foreground">{stat.label}</div>
+          <div className="text-lg sm:text-2xl font-extrabold text-foreground">{stat.value}</div>
+          <div className="text-xs sm:text-sm text-muted-foreground truncate">{stat.label}</div>
         </div>
       ))}
     </div>
