@@ -248,6 +248,27 @@ const translations = {
     "admin.orEnterPath": "Ou digite o caminho...",
     "admin.imageUploaded": "Imagem enviada com sucesso.",
     "admin.imageUploadError": "Não foi possível enviar a imagem.",
+
+    // Share
+    "share.shareCollection": "Compartilhar Coleção",
+    "share.share": "Compartilhar",
+    "share.shareDescription": "Compartilhe sua coleção e wishlist com amigos usando este link.",
+    "share.copied": "Link copiado!",
+    "share.copiedDescription": "O link foi copiado para a área de transferência.",
+    "share.copyError": "Não foi possível copiar o link.",
+    "share.shareTitle": "Minha Coleção de Amiibos",
+    "share.shareText": "Confira minha coleção de Amiibos!",
+
+    // Public Collection
+    "publicCollection.collectionOf": "Coleção de",
+    "publicCollection.publicView": "Visualização pública da coleção",
+    "publicCollection.collection": "Coleção",
+    "publicCollection.noAmiibos": "Esta coleção ainda não possui amiibos.",
+    "publicCollection.noWishlist": "A wishlist está vazia.",
+    "publicCollection.userNotFound": "Usuário não encontrado",
+    "publicCollection.loadError": "Erro ao carregar a coleção",
+    "publicCollection.backHome": "Voltar ao início",
+    "publicCollection.collector": "Colecionador",
   },
   es: {
     // Header
@@ -486,6 +507,27 @@ const translations = {
     "admin.orEnterPath": "O ingresa la ruta...",
     "admin.imageUploaded": "Imagen subida con éxito.",
     "admin.imageUploadError": "No se pudo subir la imagen.",
+
+    // Share
+    "share.shareCollection": "Compartir Colección",
+    "share.share": "Compartir",
+    "share.shareDescription": "Comparte tu colección y lista de deseos con amigos usando este enlace.",
+    "share.copied": "¡Enlace copiado!",
+    "share.copiedDescription": "El enlace fue copiado al portapapeles.",
+    "share.copyError": "No se pudo copiar el enlace.",
+    "share.shareTitle": "Mi Colección de Amiibos",
+    "share.shareText": "¡Mira mi colección de Amiibos!",
+
+    // Public Collection
+    "publicCollection.collectionOf": "Colección de",
+    "publicCollection.publicView": "Vista pública de la colección",
+    "publicCollection.collection": "Colección",
+    "publicCollection.noAmiibos": "Esta colección aún no tiene amiibos.",
+    "publicCollection.noWishlist": "La lista de deseos está vacía.",
+    "publicCollection.userNotFound": "Usuario no encontrado",
+    "publicCollection.loadError": "Error al cargar la colección",
+    "publicCollection.backHome": "Volver al inicio",
+    "publicCollection.collector": "Coleccionista",
   },
   en: {
     // Header
@@ -724,6 +766,27 @@ const translations = {
     "admin.orEnterPath": "Or enter the path...",
     "admin.imageUploaded": "Image uploaded successfully.",
     "admin.imageUploadError": "Could not upload image.",
+
+    // Share
+    "share.shareCollection": "Share Collection",
+    "share.share": "Share",
+    "share.shareDescription": "Share your collection and wishlist with friends using this link.",
+    "share.copied": "Link copied!",
+    "share.copiedDescription": "The link has been copied to your clipboard.",
+    "share.copyError": "Could not copy link.",
+    "share.shareTitle": "My Amiibo Collection",
+    "share.shareText": "Check out my Amiibo collection!",
+
+    // Public Collection
+    "publicCollection.collectionOf": "Collection of",
+    "publicCollection.publicView": "Public view of the collection",
+    "publicCollection.collection": "Collection",
+    "publicCollection.noAmiibos": "This collection has no amiibos yet.",
+    "publicCollection.noWishlist": "The wishlist is empty.",
+    "publicCollection.userNotFound": "User not found",
+    "publicCollection.loadError": "Error loading collection",
+    "publicCollection.backHome": "Back to home",
+    "publicCollection.collector": "Collector",
   },
 };
 

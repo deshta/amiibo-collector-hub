@@ -9,6 +9,7 @@ import { AmiiboDetailModal } from '@/components/AmiiboDetailModal';
 import { CollectionStats } from '@/components/CollectionStats';
 import { SeriesStats } from '@/components/SeriesStats';
 import { Footer } from '@/components/Footer';
+import { ShareCollectionButton } from '@/components/ShareCollectionButton';
 import { SearchAutocomplete } from '@/components/SearchAutocomplete';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -505,6 +506,7 @@ export default function Index() {
               {t('index.manageAmiibos')}
             </p>
           </div>
+          <ShareCollectionButton userId={user.id} />
         </div>
 
         {/* Stats */}
