@@ -17,6 +17,7 @@ interface AmiiboCardProps {
   isBoxed?: boolean;
   isInWishlist?: boolean;
   condition?: AmiiboCondition;
+  isPublicView?: boolean;
   onAdd?: () => void;
   onRemove?: () => void;
   onToggleBoxed?: () => void;
@@ -33,6 +34,7 @@ export function AmiiboCard({
   isBoxed = false,
   isInWishlist = false,
   condition = 'new',
+  isPublicView = false,
   onAdd,
   onRemove,
   onToggleBoxed,
@@ -125,78 +127,80 @@ export function AmiiboCard({
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex gap-1 sm:gap-2">
-        {isInCollection ? (
-          <>
-            <Button
-              variant={isBoxed ? "success" : "glass"}
-              size="sm"
-              className="flex-1 gap-0.5 sm:gap-1 h-7 sm:h-9 px-2 sm:px-3"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleBoxed?.();
-              }}
-              title={isBoxed ? t('card.markAsUnboxed') : t('card.markAsBoxed')}
-            >
-              {isBoxed ? (
-                <>
-                  <Package className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="text-[10px] sm:text-xs hidden xs:inline">{t('card.boxed')}</span>
-                </>
-              ) : (
-                <>
-                  <PackageOpen className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="text-[10px] sm:text-xs hidden xs:inline">{t('card.unboxed')}</span>
-                </>
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onRemove?.();
-              }}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 sm:h-9 w-7 sm:w-9 p-0"
-            >
-              <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button
-              variant="default"
-              size="sm"
-              className="flex-1 h-7 sm:h-9 px-2 sm:px-3 gap-0.5 sm:gap-1"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAdd?.();
-              }}
-            >
-              <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="text-[10px] sm:text-xs">{t('card.add')}</span>
-            </Button>
-            <Button
-              variant={isInWishlist ? "default" : "ghost"}
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleWishlist?.();
-              }}
-              className={cn(
-                "h-7 sm:h-9 w-7 sm:w-9 p-0",
-                isInWishlist 
-                  ? "bg-pink-500 hover:bg-pink-600 text-white" 
-                  : "text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10"
-              )}
-              title={isInWishlist ? t('card.removeFromWishlist') : t('card.addToWishlist')}
-            >
-              <Heart className={cn("w-3 h-3 sm:w-4 sm:h-4", isInWishlist && "fill-current")} />
-            </Button>
-          </>
-        )}
-      </div>
+      {/* Actions - hide in public view */}
+      {!isPublicView && (
+        <div className="flex gap-1 sm:gap-2">
+          {isInCollection ? (
+            <>
+              <Button
+                variant={isBoxed ? "success" : "glass"}
+                size="sm"
+                className="flex-1 gap-0.5 sm:gap-1 h-7 sm:h-9 px-2 sm:px-3"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleBoxed?.();
+                }}
+                title={isBoxed ? t('card.markAsUnboxed') : t('card.markAsBoxed')}
+              >
+                {isBoxed ? (
+                  <>
+                    <Package className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="text-[10px] sm:text-xs hidden xs:inline">{t('card.boxed')}</span>
+                  </>
+                ) : (
+                  <>
+                    <PackageOpen className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="text-[10px] sm:text-xs hidden xs:inline">{t('card.unboxed')}</span>
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove?.();
+                }}
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 sm:h-9 w-7 sm:w-9 p-0"
+              >
+                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="default"
+                size="sm"
+                className="flex-1 h-7 sm:h-9 px-2 sm:px-3 gap-0.5 sm:gap-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAdd?.();
+                }}
+              >
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="text-[10px] sm:text-xs">{t('card.add')}</span>
+              </Button>
+              <Button
+                variant={isInWishlist ? "default" : "ghost"}
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleWishlist?.();
+                }}
+                className={cn(
+                  "h-7 sm:h-9 w-7 sm:w-9 p-0",
+                  isInWishlist 
+                    ? "bg-pink-500 hover:bg-pink-600 text-white" 
+                    : "text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10"
+                )}
+                title={isInWishlist ? t('card.removeFromWishlist') : t('card.addToWishlist')}
+              >
+                <Heart className={cn("w-3 h-3 sm:w-4 sm:h-4", isInWishlist && "fill-current")} />
+              </Button>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
