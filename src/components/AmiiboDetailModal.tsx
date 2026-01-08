@@ -18,6 +18,8 @@ import {
 import { cn } from '@/lib/utils';
 import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { ImageZoom } from '@/components/ImageZoom';
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
 
@@ -63,6 +65,7 @@ export function AmiiboDetailModal({
   onConditionChange,
 }: AmiiboDetailModalProps) {
   const { t, language } = useLanguage();
+  const { lightTap, success } = useHapticFeedback();
   const [imageError, setImageError] = useState(false);
   
   // Handle browser back button to close drawer
@@ -120,13 +123,12 @@ export function AmiiboDetailModal({
         </DrawerHeader>
         
         <div className="flex flex-col items-center gap-4 px-4 pb-6 overflow-y-auto">
-          {/* Image - Compact size */}
+          {/* Image - Zoomable */}
           <div className="rounded-xl bg-gradient-to-b from-muted/50 to-muted p-3">
             {imageUrl && !imageError ? (
-              <img
+              <ImageZoom
                 src={imageUrl}
                 alt={amiibo.name}
-                loading="lazy"
                 className="max-w-[140px] h-auto"
                 onError={() => setImageError(true)}
               />
@@ -283,7 +285,10 @@ export function AmiiboDetailModal({
                   <Button
                     variant={isBoxed ? "success" : "secondary"}
                     className="flex-1 h-10"
-                    onClick={onToggleBoxed}
+                    onClick={() => {
+                      lightTap();
+                      onToggleBoxed?.();
+                    }}
                     title={isBoxed ? t('card.markAsUnboxed') : t('card.markAsBoxed')}
                   >
                     {isBoxed ? (
@@ -301,7 +306,10 @@ export function AmiiboDetailModal({
                   <Button
                     variant="destructive"
                     className="h-10"
-                    onClick={onRemove}
+                    onClick={() => {
+                      lightTap();
+                      onRemove?.();
+                    }}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -311,7 +319,10 @@ export function AmiiboDetailModal({
                   <Button
                     variant="default"
                     className="flex-1 h-10"
-                    onClick={onAdd}
+                    onClick={() => {
+                      success();
+                      onAdd?.();
+                    }}
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     {t('card.addToCollection')}
@@ -324,7 +335,10 @@ export function AmiiboDetailModal({
                         ? "bg-pink-500 hover:bg-pink-600 text-white" 
                         : "hover:text-pink-500 hover:border-pink-500"
                     )}
-                    onClick={onToggleWishlist}
+                    onClick={() => {
+                      lightTap();
+                      onToggleWishlist?.();
+                    }}
                   >
                     <Heart className={cn("w-4 h-4", isInWishlist && "fill-current")} />
                   </Button>
