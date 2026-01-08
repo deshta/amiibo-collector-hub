@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
 
@@ -43,6 +44,7 @@ export function AmiiboCard({
   const [imageError, setImageError] = useState(false);
   const imageUrl = getAmiiboImageUrl(imagePath);
   const { t } = useLanguage();
+  const { lightTap, success } = useHapticFeedback();
 
   const conditionConfig = {
     new: { icon: Sparkles, label: t('condition.new'), color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
@@ -138,6 +140,7 @@ export function AmiiboCard({
                 className="flex-1 gap-0.5 sm:gap-1 h-7 sm:h-9 px-2 sm:px-3"
                 onClick={(e) => {
                   e.stopPropagation();
+                  lightTap();
                   onToggleBoxed?.();
                 }}
                 title={isBoxed ? t('card.markAsUnboxed') : t('card.markAsBoxed')}
@@ -159,6 +162,7 @@ export function AmiiboCard({
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
+                  lightTap();
                   onRemove?.();
                 }}
                 className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 sm:h-9 w-7 sm:w-9 p-0"
@@ -174,6 +178,7 @@ export function AmiiboCard({
                 className="flex-1 h-7 sm:h-9 px-2 sm:px-3 gap-0.5 sm:gap-1"
                 onClick={(e) => {
                   e.stopPropagation();
+                  success();
                   onAdd?.();
                 }}
               >
@@ -185,6 +190,7 @@ export function AmiiboCard({
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
+                  lightTap();
                   onToggleWishlist?.();
                 }}
                 className={cn(

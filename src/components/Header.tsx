@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,11 +9,11 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ProfileMenu } from '@/components/ProfileMenu';
 import { Gamepad2, LogOut, User, Moon, Sun, Info, Sparkles, Shield, Menu, X } from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -63,6 +63,30 @@ export function Header() {
   const handleMobileNavigation = (action: () => void) => {
     action();
     setMobileMenuOpen(false);
+  };
+
+  // Handle browser back button to close drawer
+  useEffect(() => {
+    if (showAbout) {
+      window.history.pushState({ aboutDrawerOpen: true }, '');
+      
+      const handlePopState = () => {
+        setShowAbout(false);
+      };
+      
+      window.addEventListener('popstate', handlePopState);
+      return () => window.removeEventListener('popstate', handlePopState);
+    }
+  }, [showAbout]);
+
+  const handleAboutClose = (open: boolean) => {
+    if (!open) {
+      if (window.history.state?.aboutDrawerOpen) {
+        window.history.back();
+      } else {
+        setShowAbout(false);
+      }
+    }
   };
 
   return (
@@ -211,16 +235,16 @@ export function Header() {
 
       <ProfileMenu isOpen={showProfile} onClose={() => setShowProfile(false)} />
 
-      {/* About Dialog */}
-      <Dialog open={showAbout} onOpenChange={setShowAbout}>
-        <DialogContent className="sm:max-w-lg max-h-[85vh]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+      {/* About Drawer */}
+      <Drawer open={showAbout} onOpenChange={handleAboutClose}>
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader className="pb-2">
+            <DrawerTitle className="flex items-center justify-center gap-2">
               <Gamepad2 className="w-5 h-5 text-primary" />
               Amiibo Tracker
-            </DialogTitle>
-          </DialogHeader>
-          <ScrollArea className="max-h-[60vh] pr-4">
+            </DrawerTitle>
+          </DrawerHeader>
+          <ScrollArea className="max-h-[60vh] px-4 pb-6">
             <div className="space-y-6">
               <div className="flex items-center justify-center">
                 <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-nintendo shadow-lg">
@@ -265,8 +289,8 @@ export function Header() {
               </div>
             </div>
           </ScrollArea>
-        </DialogContent>
-      </Dialog>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 }
