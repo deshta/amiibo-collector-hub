@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { User, Calendar, Globe, Trash2, Loader2, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+} from '@/components/ui/drawer';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -88,6 +88,33 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
     }
   }, [isOpen, user]);
 
+  // Handle browser back button
+  useEffect(() => {
+    if (isOpen) {
+      window.history.pushState({ profileOpen: true }, '');
+      
+      const handlePopState = () => {
+        onClose();
+      };
+      
+      window.addEventListener('popstate', handlePopState);
+      
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }
+  }, [isOpen, onClose]);
+
+  const handleClose = (open: boolean) => {
+    if (!open) {
+      if (window.history.state?.profileOpen) {
+        window.history.back();
+      } else {
+        onClose();
+      }
+    }
+  };
+
   const loadProfile = async () => {
     if (!user) return;
 
@@ -162,25 +189,68 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
     }
   };
 
+  const handlePasswordChange = async () => {
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: t('profile.error'),
+        description: t('profile.passwordMismatch'),
+        variant: 'destructive',
+      });
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast({
+        title: t('profile.error'),
+        description: 'Password must be at least 6 characters',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setChangingPassword(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: t('profile.passwordChanged'),
+        description: t('profile.passwordChangedDesc'),
+      });
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      console.error('Error changing password:', error);
+      toast({
+        title: t('profile.passwordError'),
+        variant: 'destructive',
+      });
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+      <Drawer open={isOpen} onOpenChange={handleClose}>
+        <DrawerContent className="max-h-[90vh]">
+          <DrawerHeader className="pb-2">
+            <DrawerTitle className="flex items-center justify-center gap-2">
               <User className="w-5 h-5 text-primary" />
               {t('profile.title')}
-            </DialogTitle>
-            <DialogDescription>
+            </DrawerTitle>
+            <DrawerDescription className="text-center">
               {user?.email}
-            </DialogDescription>
-          </DialogHeader>
+            </DrawerDescription>
+          </DrawerHeader>
 
-          <div className="space-y-4 py-4">
+          <div className="px-4 pb-6 space-y-4 overflow-y-auto">
             {/* Name */}
-            <div className="space-y-2">
-              <Label htmlFor="name" className="flex items-center gap-2">
-                <User className="w-4 h-4" />
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="flex items-center gap-2 text-sm">
+                <User className="w-3.5 h-3.5" />
                 {t('profile.name')}
               </Label>
               <Input
@@ -188,13 +258,14 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t('profile.namePlaceholder')}
+                className="h-10"
               />
             </div>
 
             {/* Birthdate */}
-            <div className="space-y-2">
-              <Label htmlFor="birthdate" className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
+            <div className="space-y-1.5">
+              <Label htmlFor="birthdate" className="flex items-center gap-2 text-sm">
+                <Calendar className="w-3.5 h-3.5" />
                 {t('profile.birthdate')}
               </Label>
               <Input
@@ -202,17 +273,18 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
                 type="date"
                 value={birthdate}
                 onChange={(e) => setBirthdate(e.target.value)}
+                className="h-10"
               />
             </div>
 
             {/* Country */}
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Globe className="w-4 h-4" />
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-2 text-sm">
+                <Globe className="w-3.5 h-3.5" />
                 {t('profile.country')}
               </Label>
               <Select value={country} onValueChange={setCountry}>
-                <SelectTrigger>
+                <SelectTrigger className="h-10">
                   <SelectValue placeholder={t('profile.countryPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -236,7 +308,7 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
 
             {/* Save Button */}
             <Button
-              className="w-full"
+              className="w-full h-10"
               onClick={handleSave}
               disabled={saving}
             >
@@ -251,80 +323,41 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
             </Button>
 
             {/* Change Password Section */}
-            <div className="pt-4 border-t border-border">
+            <div className="pt-3 border-t border-border">
               <div className="space-y-3">
-                <div className="flex items-center gap-2 font-medium">
-                  <Lock className="w-4 h-4 text-primary" />
+                <div className="flex items-center gap-2 font-medium text-sm">
+                  <Lock className="w-3.5 h-3.5 text-primary" />
                   {t('profile.changePassword')}
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword">{t('profile.newPassword')}</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="newPassword" className="text-sm">{t('profile.newPassword')}</Label>
                   <Input
                     id="newPassword"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
+                    className="h-10"
                   />
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">{t('profile.confirmPassword')}</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="confirmPassword" className="text-sm">{t('profile.confirmPassword')}</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
+                    className="h-10"
                   />
                 </div>
                 
                 <Button
                   variant="secondary"
-                  className="w-full"
-                  onClick={async () => {
-                    if (newPassword !== confirmPassword) {
-                      toast({
-                        title: t('profile.error'),
-                        description: t('profile.passwordMismatch'),
-                        variant: 'destructive',
-                      });
-                      return;
-                    }
-                    if (newPassword.length < 6) {
-                      toast({
-                        title: t('profile.error'),
-                        description: 'Password must be at least 6 characters',
-                        variant: 'destructive',
-                      });
-                      return;
-                    }
-                    
-                    setChangingPassword(true);
-                    try {
-                      const { error } = await supabase.auth.updateUser({
-                        password: newPassword,
-                      });
-                      
-                      if (error) throw error;
-                      
-                      toast({
-                        title: t('profile.passwordChanged'),
-                        description: t('profile.passwordChangedDesc'),
-                      });
-                      setNewPassword('');
-                      setConfirmPassword('');
-                    } catch (error) {
-                      console.error('Error changing password:', error);
-                      toast({
-                        title: t('profile.passwordError'),
-                        variant: 'destructive',
-                      });
-                    } finally {
-                      setChangingPassword(false);
-                    }
-                  }}
+                  className="w-full h-10"
+                  onClick={handlePasswordChange}
                   disabled={changingPassword || !newPassword || !confirmPassword}
                 >
                   {changingPassword ? (
@@ -343,18 +376,18 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
             </div>
 
             {/* Delete Account Section */}
-            <div className="pt-4 border-t border-destructive/20">
-              <div className="rounded-lg bg-destructive/10 p-4 space-y-3">
-                <div className="flex items-center gap-2 text-destructive font-medium">
-                  <Trash2 className="w-4 h-4" />
+            <div className="pt-3 border-t border-destructive/20">
+              <div className="rounded-lg bg-destructive/10 p-3 space-y-2">
+                <div className="flex items-center gap-2 text-destructive font-medium text-sm">
+                  <Trash2 className="w-3.5 h-3.5" />
                   {t('profile.deleteAccount')}
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {t('profile.deleteWarning')}
                 </p>
                 <Button
                   variant="destructive"
-                  className="w-full"
+                  className="w-full h-9"
                   onClick={() => setShowDeleteConfirm(true)}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
@@ -363,8 +396,8 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
               </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </DrawerContent>
+      </Drawer>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
