@@ -129,6 +129,9 @@ const translations = {
     "card.addToWishlist": "Adicionar à wishlist",
     "card.condition": "Condição",
 
+    // Modal
+    "modal.swipeToNavigate": "Deslize para navegar",
+
     // Stats
     "stats.total": "Total Amiibos",
     "stats.collected": "Colecionados",
@@ -388,6 +391,9 @@ const translations = {
     "card.addToWishlist": "Agregar a lista de deseos",
     "card.condition": "Condición",
 
+    // Modal
+    "modal.swipeToNavigate": "Desliza para navegar",
+
     // Stats
     "stats.total": "Total Amiibos",
     "stats.collected": "Coleccionados",
@@ -646,6 +652,9 @@ const translations = {
     "card.removeFromWishlist": "Remove from wishlist",
     "card.addToWishlist": "Add to wishlist",
     "card.condition": "Condition",
+
+    // Modal
+    "modal.swipeToNavigate": "Swipe to navigate",
 
     // Stats
     "stats.total": "Total Amiibos",

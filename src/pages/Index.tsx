@@ -554,47 +554,95 @@ export default function Index() {
             />
             
             <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-4">
-              <Select value={selectedSeries} onValueChange={handleSeriesChange}>
-                <SelectTrigger className="w-full sm:w-[180px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm">
-                  <SelectValue placeholder={t('index.filterBySeries')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('index.allSeries')}</SelectItem>
-                  {seriesList.map(series => (
-                    <SelectItem key={series} value={series}>
-                      {series}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="relative">
+                <Select value={selectedSeries} onValueChange={handleSeriesChange}>
+                  <SelectTrigger className="w-full sm:w-[180px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm pr-8">
+                    <SelectValue placeholder={t('index.filterBySeries')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('index.allSeries')}</SelectItem>
+                    {seriesList.map(series => (
+                      <SelectItem key={series} value={series}>
+                        {series}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedSeries !== 'all' && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground hover:text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedSeries('all');
+                      updateFilter('selectedSeries', 'all');
+                    }}
+                  >
+                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                  </Button>
+                )}
+              </div>
 
-              <Select value={selectedType} onValueChange={handleTypeChange}>
-                <SelectTrigger className="w-full sm:w-[150px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm">
-                  <SelectValue placeholder={t('index.filterByType')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('index.allTypes')}</SelectItem>
-                  {typesList.map(type => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="relative">
+                <Select value={selectedType} onValueChange={handleTypeChange}>
+                  <SelectTrigger className="w-full sm:w-[150px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm pr-8">
+                    <SelectValue placeholder={t('index.filterByType')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('index.allTypes')}</SelectItem>
+                    {typesList.map(type => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedType !== 'all' && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground hover:text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedType('all');
+                      updateFilter('selectedType', 'all');
+                    }}
+                  >
+                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                  </Button>
+                )}
+              </div>
 
-              <Select value={selectedCharacter} onValueChange={handleCharacterChange}>
-                <SelectTrigger className="w-full sm:w-[180px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm">
-                  <SelectValue placeholder={t('index.filterByCharacter')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('index.allCharacters')}</SelectItem>
-                  {charactersList.map(character => (
-                    <SelectItem key={character} value={character}>
-                      {character}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="relative">
+                <Select value={selectedCharacter} onValueChange={handleCharacterChange}>
+                  <SelectTrigger className="w-full sm:w-[180px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm pr-8">
+                    <SelectValue placeholder={t('index.filterByCharacter')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('index.allCharacters')}</SelectItem>
+                    {charactersList.map(character => (
+                      <SelectItem key={character} value={character}>
+                        {character}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedCharacter !== 'all' && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground hover:text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedCharacter('all');
+                      updateFilter('selectedCharacter', 'all');
+                    }}
+                  >
+                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                  </Button>
+                )}
+              </div>
 
               <div className="flex gap-2">
                 <Select value={sortBy} onValueChange={(value: 'name' | 'release_na' | 'release_jp' | 'release_eu' | 'release_au') => setSortBy(value)}>
@@ -823,6 +871,24 @@ export default function Index() {
         }}
         onToggleWishlist={() => selectedAmiibo && toggleWishlist(selectedAmiibo.id)}
         onConditionChange={(condition) => selectedAmiibo && updateCondition(selectedAmiibo.id, condition)}
+        hasPrevious={selectedAmiibo ? paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id) > 0 : false}
+        hasNext={selectedAmiibo ? paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id) < paginatedAmiibos.length - 1 : false}
+        onPrevious={() => {
+          if (selectedAmiibo) {
+            const currentIndex = paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id);
+            if (currentIndex > 0) {
+              setSelectedAmiibo(paginatedAmiibos[currentIndex - 1]);
+            }
+          }
+        }}
+        onNext={() => {
+          if (selectedAmiibo) {
+            const currentIndex = paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id);
+            if (currentIndex < paginatedAmiibos.length - 1) {
+              setSelectedAmiibo(paginatedAmiibos[currentIndex + 1]);
+            }
+          }
+        }}
       />
 
       {/* Footer */}

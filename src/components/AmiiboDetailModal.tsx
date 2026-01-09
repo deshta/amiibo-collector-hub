@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff } from 'lucide-react';
+import { useState, useEffect, useRef, TouchEvent } from 'react';
+import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -30,19 +30,21 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
 
+interface Amiibo {
+  id: string;
+  name: string;
+  amiibo_hex_id: string | null;
+  image_path: string | null;
+  release_au: string | null;
+  release_na: string | null;
+  release_eu: string | null;
+  release_jp: string | null;
+  series: string | null;
+  type: string | null;
+}
+
 interface AmiiboDetailModalProps {
-  amiibo: {
-    id: string;
-    name: string;
-    amiibo_hex_id: string | null;
-    image_path: string | null;
-    release_au: string | null;
-    release_na: string | null;
-    release_eu: string | null;
-    release_jp: string | null;
-    series: string | null;
-    type: string | null;
-  } | null;
+  amiibo: Amiibo | null;
   isOpen: boolean;
   onClose: () => void;
   isInCollection?: boolean;
@@ -54,6 +56,11 @@ interface AmiiboDetailModalProps {
   onToggleBoxed?: () => void;
   onToggleWishlist?: () => void;
   onConditionChange?: (condition: AmiiboCondition) => void;
+  // Swipe navigation props
+  onPrevious?: () => void;
+  onNext?: () => void;
+  hasPrevious?: boolean;
+  hasNext?: boolean;
 }
 
 
@@ -70,11 +77,20 @@ export function AmiiboDetailModal({
   onToggleBoxed,
   onToggleWishlist,
   onConditionChange,
+  onPrevious,
+  onNext,
+  hasPrevious = false,
+  hasNext = false,
 }: AmiiboDetailModalProps) {
   const { t, language } = useLanguage();
   const { lightTap, success } = useHapticFeedback();
   const [imageError, setImageError] = useState(false);
   const isMobile = useIsMobile();
+  
+  // Swipe detection
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  const minSwipeDistance = 50;
   
   // Handle browser back button to close drawer (mobile only)
   useEffect(() => {
@@ -93,6 +109,11 @@ export function AmiiboDetailModal({
     }
   }, [isOpen, onClose, isMobile]);
 
+  // Reset image error when amiibo changes
+  useEffect(() => {
+    setImageError(false);
+  }, [amiibo?.id]);
+
   const handleClose = (open: boolean) => {
     if (!open) {
       if (isMobile && window.history.state?.drawerOpen) {
@@ -101,6 +122,37 @@ export function AmiiboDetailModal({
         onClose();
       }
     }
+  };
+
+  const handleTouchStart = (e: TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = null;
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    
+    const distance = touchStartX.current - touchEndX.current;
+    const isSwipe = Math.abs(distance) > minSwipeDistance;
+    
+    if (isSwipe) {
+      if (distance > 0 && hasNext) {
+        // Swipe left -> next
+        lightTap();
+        onNext?.();
+      } else if (distance < 0 && hasPrevious) {
+        // Swipe right -> previous
+        lightTap();
+        onPrevious?.();
+      }
+    }
+    
+    touchStartX.current = null;
+    touchEndX.current = null;
   };
   
   if (!amiibo) return null;
@@ -120,9 +172,14 @@ export function AmiiboDetailModal({
   };
 
   const content = (
-    <div className="flex flex-col items-center gap-4">
+    <div 
+      className="flex flex-col items-center gap-4"
+      onTouchStart={isMobile ? handleTouchStart : undefined}
+      onTouchMove={isMobile ? handleTouchMove : undefined}
+      onTouchEnd={isMobile ? handleTouchEnd : undefined}
+    >
       {/* Image - Zoomable */}
-      <div className="rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4">
+      <div className="rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 relative">
         {imageUrl && !imageError ? (
           <ImageZoom
             src={imageUrl}
@@ -139,6 +196,15 @@ export function AmiiboDetailModal({
           </div>
         )}
       </div>
+
+      {/* Swipe indicator for mobile */}
+      {isMobile && (hasPrevious || hasNext) && (
+        <div className="flex items-center justify-center gap-4 text-muted-foreground">
+          <ChevronLeft className={cn("w-5 h-5", !hasPrevious && "opacity-30")} />
+          <span className="text-xs">{t('modal.swipeToNavigate')}</span>
+          <ChevronRight className={cn("w-5 h-5", !hasNext && "opacity-30")} />
+        </div>
+      )}
 
       {/* Status Badges */}
       <div className="flex items-center justify-center gap-2 flex-wrap">
