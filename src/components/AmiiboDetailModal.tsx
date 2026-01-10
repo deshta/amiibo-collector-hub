@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, TouchEvent } from 'react';
+import { useState, useEffect, useRef, TouchEvent, useCallback } from 'react';
 import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   Drawer,
@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -115,6 +116,26 @@ export function AmiiboDetailModal({
     }
   }, [isOpen, onClose, isMobile]);
 
+  // Keyboard navigation for desktop
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (!isOpen || isMobile) return;
+    
+    if (e.key === 'ArrowLeft' && hasPrevious) {
+      e.preventDefault();
+      navigateWithAnimation('right', onPrevious);
+    } else if (e.key === 'ArrowRight' && hasNext) {
+      e.preventDefault();
+      navigateWithAnimation('left', onNext);
+    }
+  }, [isOpen, isMobile, hasPrevious, hasNext, onPrevious, onNext]);
+
+  useEffect(() => {
+    if (isOpen && !isMobile) {
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isOpen, isMobile, handleKeyDown]);
+
   // Reset image error when amiibo changes
   useEffect(() => {
     setImageError(false);
@@ -139,7 +160,8 @@ export function AmiiboDetailModal({
     touchEndX.current = e.touches[0].clientX;
   };
 
-  const navigateWithAnimation = (direction: 'left' | 'right', callback?: () => void) => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const navigateWithAnimation = useCallback((direction: 'left' | 'right', callback?: () => void) => {
     setSlideDirection(direction);
     setIsTransitioning(true);
     lightTap();
@@ -151,7 +173,7 @@ export function AmiiboDetailModal({
         setIsTransitioning(false);
       }, 50);
     }, 150);
-  };
+  }, [lightTap]);
 
   const handleTouchEnd = () => {
     if (!touchStartX.current || !touchEndX.current) return;
@@ -200,16 +222,24 @@ export function AmiiboDetailModal({
       onTouchMove={isMobile ? handleTouchMove : undefined}
       onTouchEnd={isMobile ? handleTouchEnd : undefined}
     >
-      {/* Progress indicator */}
+      {/* Progress indicator with visual bar */}
       {totalCount > 0 && (
-        <div className="flex items-center justify-center gap-2 text-muted-foreground">
-          <span className="text-sm font-medium">
-            {currentIndex + 1} / {totalCount}
-          </span>
+        <div className="w-full space-y-2">
+          <div className="flex items-center justify-between text-muted-foreground px-1">
+            <span className="text-xs">{currentIndex + 1}</span>
+            <span className="text-xs font-medium">
+              {currentIndex + 1} / {totalCount}
+            </span>
+            <span className="text-xs">{totalCount}</span>
+          </div>
+          <Progress 
+            value={((currentIndex + 1) / totalCount) * 100} 
+            className="h-1.5"
+          />
         </div>
       )}
 
-      {/* Image */}
+      {/* Image - full size on desktop */}
       <div className="rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 relative">
         {imageUrl && !imageError ? (
           <img
@@ -218,7 +248,7 @@ export function AmiiboDetailModal({
             loading="lazy"
             className={cn(
               "h-auto object-contain",
-              isMobile ? "max-w-[200px]" : "max-w-[320px]"
+              isMobile ? "max-w-[200px]" : "w-auto max-h-[400px]"
             )}
             onError={() => setImageError(true)}
           />
