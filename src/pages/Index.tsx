@@ -873,6 +873,8 @@ export default function Index() {
         onConditionChange={(condition) => selectedAmiibo && updateCondition(selectedAmiibo.id, condition)}
         hasPrevious={selectedAmiibo ? paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id) > 0 : false}
         hasNext={selectedAmiibo ? paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id) < paginatedAmiibos.length - 1 : false}
+        currentIndex={selectedAmiibo ? paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id) : 0}
+        totalCount={paginatedAmiibos.length}
         onPrevious={() => {
           if (selectedAmiibo) {
             const currentIndex = paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id);

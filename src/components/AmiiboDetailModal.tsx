@@ -25,7 +25,6 @@ import { cn } from '@/lib/utils';
 import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
-import { ImageZoom } from '@/components/ImageZoom';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
@@ -61,6 +60,9 @@ interface AmiiboDetailModalProps {
   onNext?: () => void;
   hasPrevious?: boolean;
   hasNext?: boolean;
+  // Progress indicator
+  currentIndex?: number;
+  totalCount?: number;
 }
 
 
@@ -81,10 +83,14 @@ export function AmiiboDetailModal({
   onNext,
   hasPrevious = false,
   hasNext = false,
+  currentIndex = 0,
+  totalCount = 0,
 }: AmiiboDetailModalProps) {
   const { t, language } = useLanguage();
   const { lightTap, success } = useHapticFeedback();
   const [imageError, setImageError] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
   const isMobile = useIsMobile();
   
   // Swipe detection
@@ -133,6 +139,20 @@ export function AmiiboDetailModal({
     touchEndX.current = e.touches[0].clientX;
   };
 
+  const navigateWithAnimation = (direction: 'left' | 'right', callback?: () => void) => {
+    setSlideDirection(direction);
+    setIsTransitioning(true);
+    lightTap();
+    
+    setTimeout(() => {
+      callback?.();
+      setSlideDirection(null);
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 50);
+    }, 150);
+  };
+
   const handleTouchEnd = () => {
     if (!touchStartX.current || !touchEndX.current) return;
     
@@ -142,12 +162,10 @@ export function AmiiboDetailModal({
     if (isSwipe) {
       if (distance > 0 && hasNext) {
         // Swipe left -> next
-        lightTap();
-        onNext?.();
+        navigateWithAnimation('left', onNext);
       } else if (distance < 0 && hasPrevious) {
         // Swipe right -> previous
-        lightTap();
-        onPrevious?.();
+        navigateWithAnimation('right', onPrevious);
       }
     }
     
@@ -173,20 +191,34 @@ export function AmiiboDetailModal({
 
   const content = (
     <div 
-      className="flex flex-col items-center gap-4"
+      className={cn(
+        "flex flex-col items-center gap-4 transition-all duration-150 ease-out",
+        isTransitioning && slideDirection === 'left' && "opacity-0 translate-x-[-20px]",
+        isTransitioning && slideDirection === 'right' && "opacity-0 translate-x-[20px]"
+      )}
       onTouchStart={isMobile ? handleTouchStart : undefined}
       onTouchMove={isMobile ? handleTouchMove : undefined}
       onTouchEnd={isMobile ? handleTouchEnd : undefined}
     >
-      {/* Image - Zoomable */}
+      {/* Progress indicator */}
+      {totalCount > 0 && (
+        <div className="flex items-center justify-center gap-2 text-muted-foreground">
+          <span className="text-sm font-medium">
+            {currentIndex + 1} / {totalCount}
+          </span>
+        </div>
+      )}
+
+      {/* Image */}
       <div className="rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 relative">
         {imageUrl && !imageError ? (
-          <ImageZoom
+          <img
             src={imageUrl}
             alt={amiibo.name}
+            loading="lazy"
             className={cn(
-              "h-auto",
-              isMobile ? "max-w-[200px]" : "max-w-[180px]"
+              "h-auto object-contain",
+              isMobile ? "max-w-[200px]" : "max-w-[320px]"
             )}
             onError={() => setImageError(true)}
           />
@@ -200,9 +232,9 @@ export function AmiiboDetailModal({
       {/* Swipe indicator for mobile */}
       {isMobile && (hasPrevious || hasNext) && (
         <div className="flex items-center justify-center gap-4 text-muted-foreground">
-          <ChevronLeft className={cn("w-5 h-5", !hasPrevious && "opacity-30")} />
+          <ChevronLeft className={cn("w-5 h-5 cursor-pointer hover:text-foreground", !hasPrevious && "opacity-30 cursor-default")} onClick={() => hasPrevious && navigateWithAnimation('right', onPrevious)} />
           <span className="text-xs">{t('modal.swipeToNavigate')}</span>
-          <ChevronRight className={cn("w-5 h-5", !hasNext && "opacity-30")} />
+          <ChevronRight className={cn("w-5 h-5 cursor-pointer hover:text-foreground", !hasNext && "opacity-30 cursor-default")} onClick={() => hasNext && navigateWithAnimation('left', onNext)} />
         </div>
       )}
 
@@ -432,14 +464,43 @@ export function AmiiboDetailModal({
     );
   }
 
-  // Desktop: Use Dialog
+  // Desktop: Use Dialog with navigation arrows
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold text-center">{amiibo.name}</DialogTitle>
         </DialogHeader>
-        <div className="py-2">
+        <div className="py-2 relative">
+          {/* Navigation arrows for desktop */}
+          {(hasPrevious || hasNext) && (
+            <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between pointer-events-none px-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => hasPrevious && navigateWithAnimation('right', onPrevious)}
+                disabled={!hasPrevious}
+                className={cn(
+                  "pointer-events-auto rounded-full h-10 w-10 -ml-14",
+                  !hasPrevious && "opacity-30"
+                )}
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => hasNext && navigateWithAnimation('left', onNext)}
+                disabled={!hasNext}
+                className={cn(
+                  "pointer-events-auto rounded-full h-10 w-10 -mr-14",
+                  !hasNext && "opacity-30"
+                )}
+              >
+                <ChevronRight className="w-6 h-6" />
+              </Button>
+            </div>
+          )}
           {content}
         </div>
       </DialogContent>

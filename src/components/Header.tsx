@@ -7,13 +7,19 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ProfileMenu } from '@/components/ProfileMenu';
-import { Gamepad2, LogOut, User, Moon, Sun, Info, Sparkles, Shield, Menu, X } from 'lucide-react';
+import { Gamepad2, LogOut, User, Moon, Sun, Info, Sparkles, Shield, Menu } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -23,6 +29,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const APP_VERSION = '1.0';
 
@@ -55,6 +62,7 @@ export function Header() {
   const [showProfile, setShowProfile] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -65,9 +73,9 @@ export function Header() {
     setMobileMenuOpen(false);
   };
 
-  // Handle browser back button to close drawer
+  // Handle browser back button to close drawer (mobile only)
   useEffect(() => {
-    if (showAbout) {
+    if (showAbout && isMobile) {
       window.history.pushState({ aboutDrawerOpen: true }, '');
       
       const handlePopState = () => {
@@ -77,17 +85,63 @@ export function Header() {
       window.addEventListener('popstate', handlePopState);
       return () => window.removeEventListener('popstate', handlePopState);
     }
-  }, [showAbout]);
+  }, [showAbout, isMobile]);
 
   const handleAboutClose = (open: boolean) => {
     if (!open) {
-      if (window.history.state?.aboutDrawerOpen) {
+      if (isMobile && window.history.state?.aboutDrawerOpen) {
         window.history.back();
       } else {
         setShowAbout(false);
       }
     }
   };
+
+  const aboutContent = (
+    <div className="space-y-6">
+      <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-nintendo shadow-lg">
+          <Gamepad2 className="w-10 h-10 text-primary-foreground" />
+        </div>
+      </div>
+      <div className="text-center space-y-2">
+        <p className="text-lg font-semibold text-foreground">
+          {t('about.version')}: {APP_VERSION}
+        </p>
+      </div>
+      <p className="text-center text-sm text-muted-foreground">
+        {t('about.description')}
+      </p>
+
+      <Separator />
+
+      {/* Changelog */}
+      <div className="space-y-4">
+        <h3 className="text-md font-semibold text-foreground flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-primary" />
+          {t('about.changelog')}
+        </h3>
+        
+        {CHANGELOG.map((entry, index) => (
+          <div key={entry.version} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-medium text-foreground">v{entry.version}</span>
+              <span className="text-xs text-muted-foreground">{entry.date}</span>
+            </div>
+            <ul className="space-y-1 pl-4">
+              {entry.changes.map((changeKey, i) => (
+                <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                  <span className="text-primary mt-1.5">•</span>
+                  <span>{t(changeKey)}</span>
+                </li>
+              ))}
+            </ul>
+            {index < CHANGELOG.length - 1 && <Separator className="mt-3" />}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -235,62 +289,36 @@ export function Header() {
 
       <ProfileMenu isOpen={showProfile} onClose={() => setShowProfile(false)} />
 
-      {/* About Drawer */}
-      <Drawer open={showAbout} onOpenChange={handleAboutClose}>
-        <DrawerContent className="max-h-[85vh]">
-          <DrawerHeader className="pb-2">
-            <DrawerTitle className="flex items-center justify-center gap-2">
-              <Gamepad2 className="w-5 h-5 text-primary" />
-              Amiibo Tracker
-            </DrawerTitle>
-          </DrawerHeader>
-          <ScrollArea className="max-h-[60vh] px-4 pb-6">
-            <div className="space-y-6">
-              <div className="flex items-center justify-center">
-                <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-nintendo shadow-lg">
-                  <Gamepad2 className="w-10 h-10 text-primary-foreground" />
-                </div>
-              </div>
-              <div className="text-center space-y-2">
-                <p className="text-lg font-semibold text-foreground">
-                  {t('about.version')}: {APP_VERSION}
-                </p>
-              </div>
-              <p className="text-center text-sm text-muted-foreground">
-                {t('about.description')}
-              </p>
-
-              <Separator />
-
-              {/* Changelog */}
-              <div className="space-y-4">
-                <h3 className="text-md font-semibold text-foreground flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  {t('about.changelog')}
-                </h3>
-                
-                {CHANGELOG.map((entry, index) => (
-                  <div key={entry.version} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-foreground">v{entry.version}</span>
-                      <span className="text-xs text-muted-foreground">{entry.date}</span>
-                    </div>
-                    <ul className="space-y-1 pl-4">
-                      {entry.changes.map((changeKey, i) => (
-                        <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
-                          <span className="text-primary mt-1.5">•</span>
-                          <span>{t(changeKey)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    {index < CHANGELOG.length - 1 && <Separator className="mt-3" />}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </ScrollArea>
-        </DrawerContent>
-      </Drawer>
+      {/* About - Drawer on Mobile, Dialog on Desktop */}
+      {isMobile ? (
+        <Drawer open={showAbout} onOpenChange={handleAboutClose}>
+          <DrawerContent className="max-h-[85vh]">
+            <DrawerHeader className="pb-2">
+              <DrawerTitle className="flex items-center justify-center gap-2">
+                <Gamepad2 className="w-5 h-5 text-primary" />
+                Amiibo Tracker
+              </DrawerTitle>
+            </DrawerHeader>
+            <ScrollArea className="max-h-[60vh] px-4 pb-6">
+              {aboutContent}
+            </ScrollArea>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog open={showAbout} onOpenChange={handleAboutClose}>
+          <DialogContent className="sm:max-w-md max-h-[85vh]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center justify-center gap-2">
+                <Gamepad2 className="w-5 h-5 text-primary" />
+                Amiibo Tracker
+              </DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh] pr-4">
+              {aboutContent}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }
