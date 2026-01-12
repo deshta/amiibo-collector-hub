@@ -492,7 +492,7 @@ export function AmiiboDetailModal({
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full sm:w-[180px] h-8 justify-start text-left font-normal text-xs",
+                    "w-full sm:w-[220px] h-8 justify-start text-left font-normal text-xs",
                     !acquiredAt && "text-muted-foreground"
                   )}
                 >

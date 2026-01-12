@@ -58,18 +58,14 @@ export function CollectionStats({ total, collected, boxed, wishlistCount, totalI
       color: "text-accent",
       bg: "bg-accent/10",
     },
-  ];
-
-  // Add invested stat only if there's investment
-  if (totalInvested > 0) {
-    stats.push({
+    {
       icon: Wallet,
       label: t('stats.invested'),
       value: formatCurrency(totalInvested),
       color: "text-emerald-500",
       bg: "bg-emerald-500/10",
-    });
-  }
+    },
+  ];
 
   return (
     <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-4 mb-6 sm:mb-8">
