@@ -77,7 +77,7 @@ export function SeriesStats({ amiibos, userAmiibos, selectedSeries, showOnlyColl
         </CollapsibleTrigger>
         
         <CollapsibleContent className="overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 max-h-[300px] sm:max-h-[400px] overflow-y-auto p-1 -m-1 mt-3 sm:mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 max-h-[300px] sm:max-h-[400px] overflow-y-auto p-1 -m-0 mt-3 sm:mt-4">
         {seriesStats.map((series) => {
           const isNoSeries = series.name === t('stats.noSeries');
           const isSelected = selectedSeries === series.name && showOnlyCollected;

@@ -556,7 +556,7 @@ export default function Index() {
             <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-4">
               <div className="relative">
                 <Select value={selectedSeries} onValueChange={handleSeriesChange}>
-                  <SelectTrigger className="w-full sm:w-[180px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm pr-8">
+                  <SelectTrigger className="w-full sm:w-[230px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm pr-8">
                     <SelectValue placeholder={t('index.filterBySeries')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -586,7 +586,7 @@ export default function Index() {
 
               <div className="relative">
                 <Select value={selectedType} onValueChange={handleTypeChange}>
-                  <SelectTrigger className="w-full sm:w-[150px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm pr-8">
+                  <SelectTrigger className="w-full sm:w-[180px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm pr-8">
                     <SelectValue placeholder={t('index.filterByType')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -616,7 +616,7 @@ export default function Index() {
 
               <div className="relative">
                 <Select value={selectedCharacter} onValueChange={handleCharacterChange}>
-                  <SelectTrigger className="w-full sm:w-[180px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm pr-8">
+                  <SelectTrigger className="w-full sm:w-[230px] h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-border text-xs sm:text-sm pr-8">
                     <SelectValue placeholder={t('index.filterByCharacter')} />
                   </SelectTrigger>
                   <SelectContent>

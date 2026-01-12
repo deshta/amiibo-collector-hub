@@ -63,7 +63,6 @@ interface AmiiboDetailModalProps {
   hasNext?: boolean;
   // Progress indicator
   currentIndex?: number;
-  totalCount?: number;
 }
 
 
@@ -85,7 +84,6 @@ export function AmiiboDetailModal({
   hasPrevious = false,
   hasNext = false,
   currentIndex = 0,
-  totalCount = 0,
 }: AmiiboDetailModalProps) {
   const { t, language } = useLanguage();
   const { lightTap, success } = useHapticFeedback();
@@ -222,22 +220,6 @@ export function AmiiboDetailModal({
       onTouchMove={isMobile ? handleTouchMove : undefined}
       onTouchEnd={isMobile ? handleTouchEnd : undefined}
     >
-      {/* Progress indicator with visual bar */}
-      {totalCount > 0 && (
-        <div className="w-full space-y-2">
-          <div className="flex items-center justify-between text-muted-foreground px-1">
-            <span className="text-xs">{currentIndex + 1}</span>
-            <span className="text-xs font-medium">
-              {currentIndex + 1} / {totalCount}
-            </span>
-            <span className="text-xs">{totalCount}</span>
-          </div>
-          <Progress 
-            value={((currentIndex + 1) / totalCount) * 100} 
-            className="h-1.5"
-          />
-        </div>
-      )}
 
       {/* Image - full size on desktop */}
       <div className="rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 relative">
@@ -287,7 +269,7 @@ export function AmiiboDetailModal({
       {/* Info */}
       <div className="w-full space-y-3">
         {/* Series & Type */}
-        <div className="flex items-center justify-center gap-2 flex-wrap">
+        <div className="flex items-center justify-center gap-2 flex-wrap mb-10">
           {amiibo.type && (
             <Badge variant="secondary" className="text-xs">
               {amiibo.type}
@@ -302,36 +284,36 @@ export function AmiiboDetailModal({
         </div>
 
         {/* Release dates - Compact */}
-        <div className="grid grid-cols-4 gap-2 text-xs text-center">
-          <div className="flex flex-col items-center gap-1">
+        <div className="grid grid-cols-2 text-sm text-center justify-items-center gap-x-4 gap-y-3 w-fit mx-auto pb-6">
+          <div className="flex flex-row items-center gap-1">
             <img 
               src="https://flagcdn.com/w20/jp.png" 
               alt="Japan" 
-              className="w-4 h-auto rounded-sm"
+              className="w-6 h-auto rounded-sm"
             />
             <span className="text-muted-foreground">{formatDate(amiibo.release_jp)}</span>
           </div>
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-row items-center gap-1">
             <img 
               src="https://flagcdn.com/w20/us.png" 
               alt="USA" 
-              className="w-4 h-auto rounded-sm"
+              className="w-6 h-auto rounded-sm"
             />
             <span className="text-muted-foreground">{formatDate(amiibo.release_na)}</span>
           </div>
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-row items-center gap-1">
             <img 
               src="https://flagcdn.com/w20/eu.png" 
               alt="Europe" 
-              className="w-4 h-auto rounded-sm"
+              className="w-6 h-auto rounded-sm"
             />
             <span className="text-muted-foreground">{formatDate(amiibo.release_eu)}</span>
           </div>
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-row items-center gap-1">
             <img 
               src="https://flagcdn.com/w20/au.png" 
               alt="Australia" 
-              className="w-4 h-auto rounded-sm"
+              className="w-6 h-auto rounded-sm"
             />
             <span className="text-muted-foreground">{formatDate(amiibo.release_au)}</span>
           </div>
