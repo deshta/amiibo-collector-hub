@@ -1,4 +1,4 @@
-import { Package, Trophy, Star, Box, Heart } from "lucide-react";
+import { Package, Trophy, Star, Box, Heart, Wallet } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
 interface CollectionStatsProps {
@@ -6,11 +6,21 @@ interface CollectionStatsProps {
   collected: number;
   boxed: number;
   wishlistCount: number;
+  totalInvested?: number;
 }
 
-export function CollectionStats({ total, collected, boxed, wishlistCount }: CollectionStatsProps) {
+export function CollectionStats({ total, collected, boxed, wishlistCount, totalInvested = 0 }: CollectionStatsProps) {
   const { t } = useLanguage();
   const percentage = total > 0 ? Math.round((collected / total) * 100) : 0;
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
   const stats = [
     {
@@ -50,8 +60,19 @@ export function CollectionStats({ total, collected, boxed, wishlistCount }: Coll
     },
   ];
 
+  // Add invested stat only if there's investment
+  if (totalInvested > 0) {
+    stats.push({
+      icon: Wallet,
+      label: t('stats.invested'),
+      value: formatCurrency(totalInvested),
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+    });
+  }
+
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-4 mb-6 sm:mb-8">
+    <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-4 mb-6 sm:mb-8">
       {stats.map((stat, index) => (
         <div
           key={stat.label}

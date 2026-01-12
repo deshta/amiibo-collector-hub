@@ -130,6 +130,9 @@ const translations = {
     "card.condition": "Condição",
     "card.valuePayed": "Valor pago",
     "card.valueUpdated": "Valor atualizado",
+    "card.acquiredAt": "Data de aquisição",
+    "card.selectDate": "Selecionar data",
+    "card.dateUpdated": "Data atualizada",
 
     // Modal
     "modal.swipeToNavigate": "Deslize para navegar",
@@ -140,6 +143,7 @@ const translations = {
     "stats.boxed": "Lacrados",
     "stats.wishlist": "Wishlist",
     "stats.progress": "Progresso",
+    "stats.invested": "Investido",
     "stats.collectionProgress": "Progresso da Coleção por Série",
     "stats.noSeries": "Sem série",
     "stats.filterCollected": "Clique para filtrar os amiibos colecionados desta série",
@@ -394,6 +398,9 @@ const translations = {
     "card.condition": "Condición",
     "card.valuePayed": "Valor pagado",
     "card.valueUpdated": "Valor actualizado",
+    "card.acquiredAt": "Fecha de adquisición",
+    "card.selectDate": "Seleccionar fecha",
+    "card.dateUpdated": "Fecha actualizada",
 
     // Modal
     "modal.swipeToNavigate": "Desliza para navegar",
@@ -404,6 +411,7 @@ const translations = {
     "stats.boxed": "Sellados",
     "stats.wishlist": "Lista de deseos",
     "stats.progress": "Progreso",
+    "stats.invested": "Invertido",
     "stats.collectionProgress": "Progreso de Colección por Serie",
     "stats.noSeries": "Sin serie",
     "stats.filterCollected": "Clic para filtrar los amiibos coleccionados de esta serie",
@@ -658,6 +666,9 @@ const translations = {
     "card.condition": "Condition",
     "card.valuePayed": "Value paid",
     "card.valueUpdated": "Value updated",
+    "card.acquiredAt": "Acquisition date",
+    "card.selectDate": "Select date",
+    "card.dateUpdated": "Date updated",
 
     // Modal
     "modal.swipeToNavigate": "Swipe to navigate",
@@ -668,6 +679,7 @@ const translations = {
     "stats.boxed": "Boxed",
     "stats.wishlist": "Wishlist",
     "stats.progress": "Progress",
+    "stats.invested": "Invested",
     "stats.collectionProgress": "Collection Progress by Series",
     "stats.noSeries": "No series",
     "stats.filterCollected": "Click to filter collected amiibos from this series",
