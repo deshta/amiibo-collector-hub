@@ -59,6 +59,7 @@ interface UserAmiibo {
   is_boxed: boolean;
   condition: AmiiboCondition;
   value_payed: number | null;
+  acquired_at: string | null;
 }
 
 interface WishlistItem {
@@ -145,7 +146,8 @@ export default function Index() {
       setUserAmiibos((collectionResult.data || []).map(item => ({
         ...item,
         condition: (item.condition || 'new') as AmiiboCondition,
-        value_payed: item.value_payed ?? null
+        value_payed: item.value_payed ?? null,
+        acquired_at: item.acquired_at ?? null
       })));
       setWishlist(wishlistResult.data || []);
     } catch (error) {
@@ -350,6 +352,36 @@ export default function Index() {
     }
   };
 
+  const updateAcquiredAt = async (amiiboId: string, date: Date | null) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_amiibos')
+        .update({ acquired_at: date?.toISOString() ?? null })
+        .eq('user_id', user.id)
+        .eq('amiibo_id', amiiboId);
+
+      if (error) throw error;
+
+      setUserAmiibos(userAmiibos.map(ua => 
+        ua.amiibo_id === amiiboId ? { ...ua, acquired_at: date?.toISOString() ?? null } : ua
+      ));
+      
+      toast({
+        title: t('toast.updated'),
+        description: t('card.dateUpdated'),
+      });
+    } catch (error) {
+      console.error('Error updating acquired date:', error);
+      toast({
+        title: t('toast.error'),
+        description: t('toast.updateError'),
+        variant: 'destructive',
+      });
+    }
+  };
+
   const toggleWishlist = async (amiiboId: string) => {
     if (!user) return;
 
@@ -493,6 +525,7 @@ export default function Index() {
 
   const collectedCount = userAmiibos.length;
   const boxedCount = userAmiibos.filter(ua => ua.is_boxed).length;
+  const totalInvested = userAmiibos.reduce((sum, ua) => sum + (ua.value_payed || 0), 0);
 
   if (authLoading || loading) {
     return (
@@ -547,6 +580,7 @@ export default function Index() {
           collected={collectedCount}
           boxed={boxedCount}
           wishlistCount={wishlist.length}
+          totalInvested={totalInvested}
         />
 
         {/* Series Stats */}
@@ -894,6 +928,7 @@ export default function Index() {
         isInWishlist={selectedAmiibo ? isInWishlist(selectedAmiibo.id) : false}
         condition={selectedAmiibo ? getUserAmiibo(selectedAmiibo.id)?.condition || 'new' : 'new'}
         valuePayed={selectedAmiibo ? getUserAmiibo(selectedAmiibo.id)?.value_payed ?? null : null}
+        acquiredAt={selectedAmiibo ? getUserAmiibo(selectedAmiibo.id)?.acquired_at ?? null : null}
         onAdd={() => selectedAmiibo && addToCollection(selectedAmiibo.id)}
         onRemove={() => selectedAmiibo && removeFromCollection(selectedAmiibo.id)}
         onToggleBoxed={() => {
@@ -905,6 +940,7 @@ export default function Index() {
         onToggleWishlist={() => selectedAmiibo && toggleWishlist(selectedAmiibo.id)}
         onConditionChange={(condition) => selectedAmiibo && updateCondition(selectedAmiibo.id, condition)}
         onValuePayedChange={(value) => selectedAmiibo && updateValuePayed(selectedAmiibo.id, value)}
+        onAcquiredAtChange={(date) => selectedAmiibo && updateAcquiredAt(selectedAmiibo.id, date)}
         hasPrevious={selectedAmiibo ? paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id) > 0 : false}
         hasNext={selectedAmiibo ? paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id) < paginatedAmiibos.length - 1 : false}
         currentIndex={selectedAmiibo ? paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id) : 0}

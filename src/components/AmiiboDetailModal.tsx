@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, TouchEvent, useCallback } from 'react';
-import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff, ChevronLeft, ChevronRight, DollarSign } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale/pt-BR';
+import { es } from 'date-fns/locale/es';
+import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff, ChevronLeft, ChevronRight, DollarSign, CalendarIcon } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -12,6 +15,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -23,6 +31,7 @@ import {
 } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
+import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -53,12 +62,14 @@ interface AmiiboDetailModalProps {
   isInWishlist?: boolean;
   condition?: AmiiboCondition;
   valuePayed?: number | null;
+  acquiredAt?: string | null;
   onAdd?: () => void;
   onRemove?: () => void;
   onToggleBoxed?: () => void;
   onToggleWishlist?: () => void;
   onConditionChange?: (condition: AmiiboCondition) => void;
   onValuePayedChange?: (value: number | null) => void;
+  onAcquiredAtChange?: (date: Date | null) => void;
   // Swipe navigation props
   onPrevious?: () => void;
   onNext?: () => void;
@@ -79,12 +90,14 @@ export function AmiiboDetailModal({
   isInWishlist = false,
   condition = 'new',
   valuePayed,
+  acquiredAt,
   onAdd,
   onRemove,
   onToggleBoxed,
   onToggleWishlist,
   onConditionChange,
   onValuePayedChange,
+  onAcquiredAtChange,
   onPrevious,
   onNext,
   hasPrevious = false,
@@ -464,6 +477,40 @@ export function AmiiboDetailModal({
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Acquisition Date Picker */}
+        {isInCollection && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 p-3 rounded-lg bg-muted/50">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <CalendarIcon className="w-4 h-4 text-muted-foreground shrink-0" />
+              <span className="text-xs text-muted-foreground whitespace-nowrap">{t('card.acquiredAt')}:</span>
+            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full sm:w-[180px] h-8 justify-start text-left font-normal text-xs",
+                    !acquiredAt && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-3 w-3" />
+                  {acquiredAt ? format(new Date(acquiredAt), "PPP", { locale: language === 'pt' ? ptBR : language === 'es' ? es : undefined }) : <span>{t('card.selectDate')}</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 z-[100]" align="center">
+                <Calendar
+                  mode="single"
+                  selected={acquiredAt ? new Date(acquiredAt) : undefined}
+                  onSelect={(date) => onAcquiredAtChange?.(date ?? null)}
+                  disabled={(date) => date > new Date()}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         )}
 
