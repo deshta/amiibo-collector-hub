@@ -58,6 +58,7 @@ interface UserAmiibo {
   amiibo_id: string;
   is_boxed: boolean;
   condition: AmiiboCondition;
+  value_payed: number | null;
 }
 
 interface WishlistItem {
@@ -143,7 +144,8 @@ export default function Index() {
       setAmiibos(amiibosResult.data || []);
       setUserAmiibos((collectionResult.data || []).map(item => ({
         ...item,
-        condition: (item.condition || 'new') as AmiiboCondition
+        condition: (item.condition || 'new') as AmiiboCondition,
+        value_payed: item.value_payed ?? null
       })));
       setWishlist(wishlistResult.data || []);
     } catch (error) {
@@ -313,6 +315,36 @@ export default function Index() {
       toast({
         title: t('toast.error'),
         description: t('toast.conditionError'),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const updateValuePayed = async (amiiboId: string, value: number | null) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_amiibos')
+        .update({ value_payed: value })
+        .eq('user_id', user.id)
+        .eq('amiibo_id', amiiboId);
+
+      if (error) throw error;
+
+      setUserAmiibos(userAmiibos.map(ua => 
+        ua.amiibo_id === amiiboId ? { ...ua, value_payed: value } : ua
+      ));
+      
+      toast({
+        title: t('toast.updated'),
+        description: t('card.valueUpdated'),
+      });
+    } catch (error) {
+      console.error('Error updating value payed:', error);
+      toast({
+        title: t('toast.error'),
+        description: t('toast.updateError'),
         variant: 'destructive',
       });
     }
@@ -861,6 +893,7 @@ export default function Index() {
         isBoxed={selectedAmiibo ? getUserAmiibo(selectedAmiibo.id)?.is_boxed || false : false}
         isInWishlist={selectedAmiibo ? isInWishlist(selectedAmiibo.id) : false}
         condition={selectedAmiibo ? getUserAmiibo(selectedAmiibo.id)?.condition || 'new' : 'new'}
+        valuePayed={selectedAmiibo ? getUserAmiibo(selectedAmiibo.id)?.value_payed ?? null : null}
         onAdd={() => selectedAmiibo && addToCollection(selectedAmiibo.id)}
         onRemove={() => selectedAmiibo && removeFromCollection(selectedAmiibo.id)}
         onToggleBoxed={() => {
@@ -871,6 +904,7 @@ export default function Index() {
         }}
         onToggleWishlist={() => selectedAmiibo && toggleWishlist(selectedAmiibo.id)}
         onConditionChange={(condition) => selectedAmiibo && updateCondition(selectedAmiibo.id, condition)}
+        onValuePayedChange={(value) => selectedAmiibo && updateValuePayed(selectedAmiibo.id, value)}
         hasPrevious={selectedAmiibo ? paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id) > 0 : false}
         hasNext={selectedAmiibo ? paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id) < paginatedAmiibos.length - 1 : false}
         currentIndex={selectedAmiibo ? paginatedAmiibos.findIndex(a => a.id === selectedAmiibo.id) : 0}

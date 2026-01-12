@@ -128,6 +128,8 @@ const translations = {
     "card.removeFromWishlist": "Remover da wishlist",
     "card.addToWishlist": "Adicionar à wishlist",
     "card.condition": "Condição",
+    "card.valuePayed": "Valor pago",
+    "card.valueUpdated": "Valor atualizado",
 
     // Modal
     "modal.swipeToNavigate": "Deslize para navegar",
@@ -390,6 +392,8 @@ const translations = {
     "card.removeFromWishlist": "Quitar de lista de deseos",
     "card.addToWishlist": "Agregar a lista de deseos",
     "card.condition": "Condición",
+    "card.valuePayed": "Valor pagado",
+    "card.valueUpdated": "Valor actualizado",
 
     // Modal
     "modal.swipeToNavigate": "Desliza para navegar",
@@ -652,6 +656,8 @@ const translations = {
     "card.removeFromWishlist": "Remove from wishlist",
     "card.addToWishlist": "Add to wishlist",
     "card.condition": "Condition",
+    "card.valuePayed": "Value paid",
+    "card.valueUpdated": "Value updated",
 
     // Modal
     "modal.swipeToNavigate": "Swipe to navigate",

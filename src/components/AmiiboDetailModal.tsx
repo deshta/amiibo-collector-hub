@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, TouchEvent, useCallback } from 'react';
-import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff, ChevronLeft, ChevronRight, DollarSign } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -51,11 +52,13 @@ interface AmiiboDetailModalProps {
   isBoxed?: boolean;
   isInWishlist?: boolean;
   condition?: AmiiboCondition;
+  valuePayed?: number | null;
   onAdd?: () => void;
   onRemove?: () => void;
   onToggleBoxed?: () => void;
   onToggleWishlist?: () => void;
   onConditionChange?: (condition: AmiiboCondition) => void;
+  onValuePayedChange?: (value: number | null) => void;
   // Swipe navigation props
   onPrevious?: () => void;
   onNext?: () => void;
@@ -63,6 +66,7 @@ interface AmiiboDetailModalProps {
   hasNext?: boolean;
   // Progress indicator
   currentIndex?: number;
+  totalCount?: number;
 }
 
 
@@ -74,22 +78,27 @@ export function AmiiboDetailModal({
   isBoxed = false,
   isInWishlist = false,
   condition = 'new',
+  valuePayed,
   onAdd,
   onRemove,
   onToggleBoxed,
   onToggleWishlist,
   onConditionChange,
+  onValuePayedChange,
   onPrevious,
   onNext,
   hasPrevious = false,
   hasNext = false,
   currentIndex = 0,
+  totalCount = 0,
 }: AmiiboDetailModalProps) {
   const { t, language } = useLanguage();
   const { lightTap, success } = useHapticFeedback();
   const [imageError, setImageError] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
+  const [localValueBRL, setLocalValueBRL] = useState<string>('');
+  const [usdRate, setUsdRate] = useState<number>(5.0); // Default rate
   const isMobile = useIsMobile();
   
   // Swipe detection
@@ -134,10 +143,46 @@ export function AmiiboDetailModal({
     }
   }, [isOpen, isMobile, handleKeyDown]);
 
-  // Reset image error when amiibo changes
+  // Reset image error and sync value when amiibo changes
   useEffect(() => {
     setImageError(false);
-  }, [amiibo?.id]);
+    setLocalValueBRL(valuePayed ? valuePayed.toString() : '');
+  }, [amiibo?.id, valuePayed]);
+
+  // Fetch USD exchange rate
+  useEffect(() => {
+    const fetchRate = async () => {
+      try {
+        const response = await fetch('https://api.exchangerate-api.com/v4/latest/BRL');
+        const data = await response.json();
+        if (data.rates?.USD) {
+          setUsdRate(data.rates.USD);
+        }
+      } catch (error) {
+        console.log('Using default USD rate');
+      }
+    };
+    fetchRate();
+  }, []);
+
+  const handleValueChange = (value: string) => {
+    // Only allow numbers and decimal point
+    const sanitized = value.replace(/[^0-9.,]/g, '').replace(',', '.');
+    setLocalValueBRL(sanitized);
+  };
+
+  const handleValueBlur = () => {
+    const numValue = parseFloat(localValueBRL);
+    if (!isNaN(numValue) && numValue >= 0) {
+      onValuePayedChange?.(numValue);
+    } else if (localValueBRL === '') {
+      onValuePayedChange?.(null);
+    }
+  };
+
+  const convertToUSD = (brl: number): string => {
+    return (brl * usdRate).toFixed(2);
+  };
 
   const handleClose = (open: boolean) => {
     if (!open) {
@@ -386,6 +431,39 @@ export function AmiiboDetailModal({
                 </SelectItem>
               </SelectContent>
             </Select>
+          </div>
+        )}
+
+        {/* Value Payed Input */}
+        {isInCollection && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 p-3 rounded-lg bg-muted/50">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <DollarSign className="w-4 h-4 text-muted-foreground shrink-0" />
+              <span className="text-xs text-muted-foreground whitespace-nowrap">{t('card.valuePayed')}:</span>
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:flex-none">
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">R$</span>
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  value={localValueBRL}
+                  onChange={(e) => handleValueChange(e.target.value)}
+                  onBlur={handleValueBlur}
+                  placeholder="0.00"
+                  className="w-full sm:w-[100px] h-8 text-xs pl-8 pr-2"
+                />
+              </div>
+              {localValueBRL && !isNaN(parseFloat(localValueBRL)) && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+                  <span>=</span>
+                  <span className="font-medium text-foreground">
+                    ${convertToUSD(parseFloat(localValueBRL))}
+                  </span>
+                  <span>USD</span>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
