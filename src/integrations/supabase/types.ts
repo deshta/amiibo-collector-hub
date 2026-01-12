@@ -102,6 +102,7 @@ export type Database = {
           is_boxed: boolean | null
           notes: string | null
           user_id: string
+          value_payed: number | null
         }
         Insert: {
           acquired_at?: string | null
@@ -112,6 +113,7 @@ export type Database = {
           is_boxed?: boolean | null
           notes?: string | null
           user_id: string
+          value_payed?: number | null
         }
         Update: {
           acquired_at?: string | null
@@ -122,6 +124,7 @@ export type Database = {
           is_boxed?: boolean | null
           notes?: string | null
           user_id?: string
+          value_payed?: number | null
         }
         Relationships: [
           {
