@@ -527,6 +527,26 @@ export default function Index() {
   const boxedCount = userAmiibos.filter(ua => ua.is_boxed).length;
   const totalInvested = userAmiibos.reduce((sum, ua) => sum + (ua.value_payed || 0), 0);
 
+  // USD exchange rate state
+  const [usdRate, setUsdRate] = useState<number>(5.5);
+
+  useEffect(() => {
+    const fetchUsdRate = async () => {
+      try {
+        const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const data = await response.json();
+        if (data.rates?.BRL) {
+          setUsdRate(data.rates.BRL);
+        }
+      } catch (error) {
+        console.error('Error fetching USD rate:', error);
+      }
+    };
+    fetchUsdRate();
+  }, []);
+
+  const totalInvestedUSD = usdRate > 0 ? totalInvested / usdRate : 0;
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
@@ -581,6 +601,7 @@ export default function Index() {
           boxed={boxedCount}
           wishlistCount={wishlist.length}
           totalInvested={totalInvested}
+          totalInvestedUSD={totalInvestedUSD}
         />
 
         {/* Series Stats */}
