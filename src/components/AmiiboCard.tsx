@@ -1,6 +1,12 @@
 import { useState } from 'react';
-import { Check, Plus, Package, PackageOpen, Trash2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff } from 'lucide-react';
+import { Check, Plus, Package, PackageOpen, Trash2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -18,6 +24,7 @@ interface AmiiboCardProps {
   isBoxed?: boolean;
   isInWishlist?: boolean;
   condition?: AmiiboCondition;
+  valuePayed?: number | null;
   isPublicView?: boolean;
   onAdd?: () => void;
   onRemove?: () => void;
@@ -35,6 +42,7 @@ export function AmiiboCard({
   isBoxed = false,
   isInWishlist = false,
   condition = 'new',
+  valuePayed,
   isPublicView = false,
   onAdd,
   onRemove,
@@ -45,6 +53,15 @@ export function AmiiboCard({
   const imageUrl = getAmiiboImageUrl(imagePath);
   const { t } = useLanguage();
   const { lightTap, success } = useHapticFeedback();
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
   const conditionConfig = {
     new: { icon: Sparkles, label: t('condition.new'), color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
@@ -125,6 +142,20 @@ export function AmiiboCard({
               <ConditionIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
               <span className="hidden sm:inline">{conditionConfig[condition].label}</span>
             </div>
+          )}
+          {isInCollection && valuePayed != null && valuePayed > 0 && (
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-0.5 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-emerald-500/10 text-emerald-500 cursor-default">
+                    <DollarSign className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">
+                  <p>{t('card.valuePayed')}: {formatCurrency(valuePayed)}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       </div>
