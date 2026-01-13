@@ -845,6 +845,7 @@ export default function Index() {
                     isBoxed={userAmiibo?.is_boxed || false}
                     isInWishlist={isInWishlist(amiibo.id)}
                     condition={userAmiibo?.condition || 'new'}
+                    valuePayed={userAmiibo?.value_payed}
                     onAdd={() => addToCollection(amiibo.id)}
                     onRemove={() => removeFromCollection(amiibo.id)}
                     onToggleBoxed={() => toggleBoxed(amiibo.id, userAmiibo?.is_boxed || false)}
