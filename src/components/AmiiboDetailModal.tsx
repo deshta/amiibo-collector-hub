@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, TouchEvent, useCallback } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
 import { es } from 'date-fns/locale/es';
-import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff, ChevronLeft, ChevronRight, DollarSign, CalendarIcon } from 'lucide-react';
+import { enUS } from 'date-fns/locale/en-US';
+import { Package, PackageOpen, Check, Plus, Trash2, Gamepad2, Heart, Sparkles, ThumbsUp, AlertTriangle, ImageOff, ChevronLeft, ChevronRight, DollarSign, CalendarIcon, Save } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -462,14 +463,22 @@ export function AmiiboDetailModal({
                   inputMode="decimal"
                   value={localValueBRL}
                   onChange={(e) => handleValueChange(e.target.value)}
-                  onBlur={handleValueBlur}
                   placeholder="0.00"
                   className="w-full sm:w-[100px] h-8 text-xs pl-8 pr-2"
                 />
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 px-3"
+                onClick={handleValueBlur}
+              >
+                <Save className="w-3 h-3 mr-1" />
+                {t('card.save')}
+              </Button>
               {localValueBRL && !isNaN(parseFloat(localValueBRL)) && (
                 <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-                  <span>=</span>
+                  <span>≈</span>
                   <span className="font-medium text-foreground">
                     ${convertToUSD(parseFloat(localValueBRL))}
                   </span>
@@ -507,6 +516,7 @@ export function AmiiboDetailModal({
                   onSelect={(date) => onAcquiredAtChange?.(date ?? null)}
                   disabled={(date) => date > new Date()}
                   initialFocus
+                  locale={language === 'pt' ? ptBR : language === 'es' ? es : enUS}
                   className={cn("p-3 pointer-events-auto")}
                 />
               </PopoverContent>
