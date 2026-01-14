@@ -38,6 +38,7 @@ import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
 
@@ -108,11 +109,11 @@ export function AmiiboDetailModal({
 }: AmiiboDetailModalProps) {
   const { t, language } = useLanguage();
   const { lightTap, success } = useHapticFeedback();
+  const { getCurrencyConfig } = useCurrency();
   const [imageError, setImageError] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
-  const [localValueBRL, setLocalValueBRL] = useState<string>('');
-  const [usdRate, setUsdRate] = useState<number>(5.0); // Default rate
+  const [localValue, setLocalValue] = useState<string>('');
   const isMobile = useIsMobile();
   
   // Swipe detection
@@ -160,42 +161,22 @@ export function AmiiboDetailModal({
   // Reset image error and sync value when amiibo changes
   useEffect(() => {
     setImageError(false);
-    setLocalValueBRL(valuePayed ? valuePayed.toString() : '');
+    setLocalValue(valuePayed ? valuePayed.toString() : '');
   }, [amiibo?.id, valuePayed]);
-
-  // Fetch USD exchange rate
-  useEffect(() => {
-    const fetchRate = async () => {
-      try {
-        const response = await fetch('https://api.exchangerate-api.com/v4/latest/BRL');
-        const data = await response.json();
-        if (data.rates?.USD) {
-          setUsdRate(data.rates.USD);
-        }
-      } catch (error) {
-        console.log('Using default USD rate');
-      }
-    };
-    fetchRate();
-  }, []);
 
   const handleValueChange = (value: string) => {
     // Only allow numbers and decimal point
     const sanitized = value.replace(/[^0-9.,]/g, '').replace(',', '.');
-    setLocalValueBRL(sanitized);
+    setLocalValue(sanitized);
   };
 
   const handleValueBlur = () => {
-    const numValue = parseFloat(localValueBRL);
+    const numValue = parseFloat(localValue);
     if (!isNaN(numValue) && numValue >= 0) {
       onValuePayedChange?.(numValue);
-    } else if (localValueBRL === '') {
+    } else if (localValue === '') {
       onValuePayedChange?.(null);
     }
-  };
-
-  const convertToUSD = (brl: number): string => {
-    return (brl * usdRate).toFixed(2);
   };
 
   const handleClose = (open: boolean) => {
@@ -457,11 +438,11 @@ export function AmiiboDetailModal({
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <div className="relative flex-1 sm:flex-none">
-                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">R$</span>
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">{getCurrencyConfig().symbol}</span>
                 <Input
                   type="text"
                   inputMode="decimal"
-                  value={localValueBRL}
+                  value={localValue}
                   onChange={(e) => handleValueChange(e.target.value)}
                   placeholder="0.00"
                   className="w-full sm:w-[100px] h-8 text-xs pl-8 pr-2"
@@ -476,15 +457,6 @@ export function AmiiboDetailModal({
                 <Save className="w-3 h-3 mr-1" />
                 {t('card.save')}
               </Button>
-              {localValueBRL && !isNaN(parseFloat(localValueBRL)) && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-                  <span>≈</span>
-                  <span className="font-medium text-foreground">
-                    ${convertToUSD(parseFloat(localValueBRL))}
-                  </span>
-                  <span>USD</span>
-                </div>
-              )}
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Calendar, Globe, Trash2, Loader2, Lock } from 'lucide-react';
+import { User, Calendar, Globe, Trash2, Loader2, Lock, Coins } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   Drawer,
@@ -40,6 +40,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useCurrency, CURRENCIES, Currency } from '@/hooks/useCurrency';
 import { supabase } from '@/integrations/supabase/client';
 
 const COUNTRIES = [
@@ -79,7 +80,7 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-
+  const { currency, setCurrency } = useCurrency();
   const [name, setName] = useState('');
   const [birthdate, setBirthdate] = useState('');
   const [country, setCountry] = useState('');
@@ -296,6 +297,29 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
                     />
                   )}
                   {c.name}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Currency */}
+      <div className="space-y-1.5">
+        <Label className="flex items-center gap-2 text-sm">
+          <Coins className="w-3.5 h-3.5" />
+          {t('profile.currency')}
+        </Label>
+        <Select value={currency} onValueChange={(value) => setCurrency(value as Currency)}>
+          <SelectTrigger className="h-10">
+            <SelectValue placeholder={t('profile.currencyPlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            {CURRENCIES.map((c) => (
+              <SelectItem key={c.code} value={c.code}>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{c.symbol}</span>
+                  <span>{c.name}</span>
                 </div>
               </SelectItem>
             ))}

@@ -1,5 +1,6 @@
 import { Package, Trophy, Star, Box, Heart, Wallet } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface CollectionStatsProps {
   total: number;
@@ -7,30 +8,12 @@ interface CollectionStatsProps {
   boxed: number;
   wishlistCount: number;
   totalInvested?: number;
-  totalInvestedUSD?: number;
 }
 
-export function CollectionStats({ total, collected, boxed, wishlistCount, totalInvested = 0, totalInvestedUSD = 0 }: CollectionStatsProps) {
+export function CollectionStats({ total, collected, boxed, wishlistCount, totalInvested = 0 }: CollectionStatsProps) {
   const { t } = useLanguage();
+  const { formatCurrency } = useCurrency();
   const percentage = total > 0 ? Math.round((collected / total) * 100) : 0;
-
-  const formatCurrencyBRL = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
-  const formatCurrencyUSD = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
 
   const stats = [
     {
@@ -85,7 +68,7 @@ export function CollectionStats({ total, collected, boxed, wishlistCount, totalI
           <div className="text-xs sm:text-sm text-muted-foreground truncate">{stat.label}</div>
         </div>
       ))}
-      {/* Invested card with USD subvalue */}
+      {/* Invested card */}
       {totalInvested > 0 && (      
         <div
           className="glass-card rounded-xl sm:rounded-2xl p-2 sm:p-4 animate-slide-up"
@@ -94,8 +77,7 @@ export function CollectionStats({ total, collected, boxed, wishlistCount, totalI
           <div className="inline-flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-500/10 mb-1 sm:mb-3">
             <Wallet className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-emerald-500" />
           </div>
-          <div className="text-lg sm:text-2xl font-extrabold text-foreground">{formatCurrencyBRL(totalInvested)}</div>
-          <div className="text-[10px] sm:text-xs text-muted-foreground/70">≈ {formatCurrencyUSD(totalInvestedUSD)}</div>
+          <div className="text-lg sm:text-2xl font-extrabold text-foreground">{formatCurrency(totalInvested)}</div>
           <div className="text-xs sm:text-sm text-muted-foreground truncate">{t('stats.invested')}</div>
         </div>
       )}
