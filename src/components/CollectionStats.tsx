@@ -86,17 +86,19 @@ export function CollectionStats({ total, collected, boxed, wishlistCount, totalI
         </div>
       ))}
       {/* Invested card with USD subvalue */}
-      <div
-        className="glass-card rounded-xl sm:rounded-2xl p-2 sm:p-4 animate-slide-up"
-        style={{ animationDelay: `${stats.length * 100}ms` }}
-      >
-        <div className="inline-flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-500/10 mb-1 sm:mb-3">
-          <Wallet className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-emerald-500" />
+      {totalInvested > 0 && (      
+        <div
+          className="glass-card rounded-xl sm:rounded-2xl p-2 sm:p-4 animate-slide-up"
+          style={{ animationDelay: `${stats.length * 100}ms` }}
+        >
+          <div className="inline-flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-500/10 mb-1 sm:mb-3">
+            <Wallet className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-emerald-500" />
+          </div>
+          <div className="text-lg sm:text-2xl font-extrabold text-foreground">{formatCurrencyBRL(totalInvested)}</div>
+          <div className="text-[10px] sm:text-xs text-muted-foreground/70">≈ {formatCurrencyUSD(totalInvestedUSD)}</div>
+          <div className="text-xs sm:text-sm text-muted-foreground truncate">{t('stats.invested')}</div>
         </div>
-        <div className="text-lg sm:text-2xl font-extrabold text-foreground">{formatCurrencyBRL(totalInvested)}</div>
-        <div className="text-[10px] sm:text-xs text-muted-foreground/70">≈ {formatCurrencyUSD(totalInvestedUSD)}</div>
-        <div className="text-xs sm:text-sm text-muted-foreground truncate">{t('stats.invested')}</div>
-      </div>
+      )}
     </div>
   );
 }
