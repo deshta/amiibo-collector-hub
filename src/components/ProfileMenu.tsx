@@ -244,7 +244,7 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
   };
 
   const profileContent = (
-    <div className="space-y-4">
+    <div className="space-y-4 p-1">
       {/* Name */}
       <div className="space-y-1.5">
         <Label htmlFor="name" className="flex items-center gap-2 text-sm">
@@ -452,10 +452,7 @@ export function ProfileMenu({ isOpen, onClose }: ProfileMenuProps) {
                 {user?.email}
               </DialogDescription>
             </DialogHeader>
-
-            <ScrollArea className="max-h-[70vh] pr-4">
               {profileContent}
-            </ScrollArea>
           </DialogContent>
         </Dialog>
       )}
