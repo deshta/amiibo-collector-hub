@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { getAmiiboImageUrl } from '@/lib/amiibo-images';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export type AmiiboCondition = 'new' | 'used' | 'damaged';
 
@@ -53,15 +54,7 @@ export function AmiiboCard({
   const imageUrl = getAmiiboImageUrl(imagePath);
   const { t } = useLanguage();
   const { lightTap, success } = useHapticFeedback();
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
+  const { formatCurrency } = useCurrency();
 
   const conditionConfig = {
     new: { icon: Sparkles, label: t('condition.new'), color: 'text-emerald-500', bg: 'bg-emerald-500/10' },

@@ -186,6 +186,8 @@ const translations = {
     "profile.passwordChanged": "Senha alterada!",
     "profile.passwordChangedDesc": "Sua senha foi alterada com sucesso.",
     "profile.passwordError": "Erro ao alterar senha",
+    "profile.currency": "Moeda",
+    "profile.currencyPlaceholder": "Selecione a moeda",
 
     // Auth - Forgot Password
     "auth.forgotPassword": "Esqueceu a senha?",
@@ -455,6 +457,8 @@ const translations = {
     "profile.passwordChanged": "¡Contraseña cambiada!",
     "profile.passwordChangedDesc": "Tu contraseña fue cambiada con éxito.",
     "profile.passwordError": "Error al cambiar contraseña",
+    "profile.currency": "Moneda",
+    "profile.currencyPlaceholder": "Selecciona la moneda",
 
     // Auth - Forgot Password
     "auth.forgotPassword": "¿Olvidaste tu contraseña?",
@@ -724,6 +728,8 @@ const translations = {
     "profile.passwordChanged": "Password changed!",
     "profile.passwordChangedDesc": "Your password was changed successfully.",
     "profile.passwordError": "Error changing password",
+    "profile.currency": "Currency",
+    "profile.currencyPlaceholder": "Select currency",
 
     // Auth - Forgot Password
     "auth.forgotPassword": "Forgot your password?",

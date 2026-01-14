@@ -65,6 +65,7 @@ export type Database = {
           birthdate: string | null
           country: string | null
           created_at: string
+          currency: string | null
           id: string
           language: string | null
           updated_at: string
@@ -75,6 +76,7 @@ export type Database = {
           birthdate?: string | null
           country?: string | null
           created_at?: string
+          currency?: string | null
           id: string
           language?: string | null
           updated_at?: string
@@ -85,6 +87,7 @@ export type Database = {
           birthdate?: string | null
           country?: string | null
           created_at?: string
+          currency?: string | null
           id?: string
           language?: string | null
           updated_at?: string
