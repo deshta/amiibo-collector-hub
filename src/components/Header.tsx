@@ -6,6 +6,7 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { CurrencySwitcher } from '@/components/CurrencySwitcher';
 import { ProfileMenu } from '@/components/ProfileMenu';
 import { Gamepad2, LogOut, User, Moon, Sun, Info, Sparkles, Shield, Menu } from 'lucide-react';
 import {
@@ -159,6 +160,7 @@ export function Header() {
           {/* Desktop Navigation */}
           <div className="hidden sm:flex items-center gap-2">
             <LanguageSwitcher />
+            <CurrencySwitcher />
             
             <Button
               variant="ghost"
@@ -209,6 +211,7 @@ export function Header() {
           {/* Mobile Navigation */}
           <div className="flex sm:hidden items-center gap-1">
             <LanguageSwitcher />
+            <CurrencySwitcher />
             
             <Button
               variant="ghost"
